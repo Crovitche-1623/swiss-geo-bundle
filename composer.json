@@ -20,13 +20,21 @@
     "http-interop/http-factory-guzzle": "^1.0",
     "league/csv": "^9.7",
     "meilisearch/meilisearch-php": "^0.24.2",
+    "symfony/cache": "6.1.*",
     "symfony/config": "6.1.*",
     "symfony/console": "6.1.*",
+    "symfony/dependency-injection": "6.1.*",
+    "symfony/filesystem": "6.1.*",
+    "symfony/finder": "6.1.*",
+    "symfony/http-client": "6.1.*",
     "symfony/http-foundation": "6.1.*",
     "symfony/form": "6.1.*",
     "symfony/monolog-bundle": "^3.1",
     "symfony/options-resolver": "6.1.*",
     "symfony/lock": "6.1.*"
+  },
+  "suggest": {
+    "ext-curl": "*"
   },
   "require-dev": {
     "jetbrains/phpstorm-attributes": "^1.0"
