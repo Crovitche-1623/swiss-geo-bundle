@@ -1,0 +1,222 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Crovitche\SwissGeoBundle\Command\Import;
+
+use Crovitche\SwissGeoBundle\Command\Import\Exception\ImportingException;
+use Crovitche\SwissGeoBundle\Command\Service\CheckTimestampInFolderService;
+use Crovitche\SwissGeoBundle\Command\Service\ExtractZipFromServerService;
+use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Extractor;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Exception;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\LockableTrait;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\OutputStyle;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+
+class ImportBuildingAddressesCommand extends Command
+{
+    use LockableTrait;
+
+    public const COMMAND_NAME = 'swiss-geo-bundle:import:building-addresses';
+    public const ADDRESSES_CACHE_NAME = 'cache___building_addresses___timestamp';
+
+    private OutputStyle $io;
+    private bool $cacheHasBeenCreated = false;
+
+    public function __construct(
+        private readonly Extractor $extractor,
+        private readonly Connection $connection,
+        private readonly ExtractZipFromServerService $extractZipFromServer,
+        private readonly LoggerInterface $logger,
+        private readonly CheckTimestampInFolderService $checkTimestampInZip
+    )
+    {
+        parent::__construct();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function configure(): void
+    {
+        $this
+            ->setName(self::COMMAND_NAME)
+            ->setDescription('Import the swiss building addresses from cadastre.ch');
+    }
+
+    /**
+     * @throws  TransportExceptionInterface
+     */
+    public function execute(
+        InputInterface  $input,
+        OutputInterface $output
+    ): int
+    {
+        if (!$this->lock()) {
+            $output->writeln(
+                sprintf(
+                    'The command %s is already running in another process.',
+                    self::COMMAND_NAME
+                )
+            );
+
+            return Command::FAILURE;
+        }
+
+        $this->io = new SymfonyStyle($input, $output);
+
+        $this->extractor->extractFromWeb(
+            "https://data.geo.admin.ch/ch.swisstopo.amtliches-gebaeudeadressverzeichnis/csv/2056/ch.swisstopo.amtliches-gebaeudeadressverzeichnis.zip",
+            function (): void {
+                ($this->checkTimestampInZip)($this->io, self::ADDRESSES_CACHE_NAME, '/var/lib/mysql-files');
+                $this->insertDataFromCsvFile();
+            },
+            "/var/lib/mysql-files"
+        );
+
+        return Command::SUCCESS;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function insertDataFromCsvFile(): void
+    {
+        $this->io->title('Importing the building addresses...');
+
+        $this->connection->beginTransaction();
+        try {
+            $this->io->info('Creating temporary table...');
+
+            $this->connection->executeQuery(/** @lang  MySQL */ "
+                CREATE TEMPORARY TABLE IF NOT EXISTS t___tmp___Building_address_to_be_inserted (
+                    egaid INT(11) UNSIGNED PRIMARY KEY NOT NULL,
+                    id_street INT(10) UNSIGNED NOT NULL,
+                    postal_code_and_label VARCHAR(110) NOT NULL,
+                    building_id DECIMAL(10) NOT NULL,
+                    entrance_number SMALLINT(6) NOT NULL,
+                    address_number VARCHAR(12) DEFAULT NULL,
+                    building_name VARCHAR(50) DEFAULT NULL,
+                    building_category VARCHAR(18) NOT NULL,
+                    address_status VARCHAR(8) NOT NULL,
+                    is_official TINYINT(1) NOT NULL,
+                    is_valid TINYINT(1) NOT NULL,
+                    northing INT(11) DEFAULT NULL,
+                    easting INT(11) DEFAULT NULL,
+                    last_modification_date DATE NOT NULL
+                );");
+            $this->io->success('Done !');
+
+            $this->io->info('Loading data from CSV file in it (This may take a while)...');
+            $this->connection->executeQuery(/** @lang  MySQL */ "
+                LOAD DATA
+                    LOCAL
+                    INFILE '/var/lib/mysql-files/pure_adr.csv'
+                    INTO TABLE t___tmp___Building_address_to_be_inserted
+                    CHARACTER SET utf8
+                    FIELDS TERMINATED BY ';'
+                    ENCLOSED BY ''
+                    LINES TERMINATED BY '\n'
+                    IGNORE 1 LINES
+                    (@ADR_EGAID, @STR_ESID, @BDG_EGID, @ADR_EDID, @STN_LABEL, @ADR_NUMBER, @BDG_CATEGORY, @BDG_NAME, @ZIP_LABEL, @COM_FOSNR, @COM_CANTON, @ADR_STATUS, @ADR_OFFICIAL, @ADR_VALID, @ADR_MODIFIED, @ADR_EASTING, @ADR_NORTHING)
+                    SET
+                        egaid = @ADR_EGAID,
+                        id_street = @STR_ESID,
+                        building_id = @BDG_EGID,
+                        entrance_number = @ADR_EDID,
+                        address_number = NULLIF(@ADR_NUMBER, ''),
+                        building_category = @BDG_CATEGORY,
+                        building_name = NULLIF(@BDG_NAME, ''),
+                        postal_code_and_label = @ZIP_LABEL,
+                        address_status = @ADR_STATUS,
+                        is_official = IF(@ADR_OFFICIAL = 'true', 1, 0),
+                        is_valid = IF(@ADR_VALID = 'true', 1, 0),
+                        northing = @ADR_NORTHING,
+                        easting = @ADR_EASTING,
+                        last_modification_date = STR_TO_DATE(@ADR_MODIFIED, '%d.%m.%Y');
+            ");
+
+            $this->io->success('Done !');
+
+            $this->io->info('Deleting existing building addresses that do not exist in the temporary table...');
+
+            $this->connection->executeQuery(/** @lang  MySQL */ "
+                # Supprime les adresses existantes qui n'existent plus dans la table d'insert
+                DELETE a0 FROM Building_address a0
+                    LEFT JOIN t___tmp___Building_address_to_be_inserted a1 ON a0.egaid = a1.egaid
+                WHERE
+                    a1.egaid IS NULL;
+            ");
+
+            $this->io->success('Done.');
+
+            $this->io->info('Adding new or more recent building addresses...');
+            $this->connection->executeQuery(/** @lang  MySQL */ "
+                # Insert les données à partir de la table d'insert si elles n'existent pas dans la table principale.
+                # Les données sont remplacés si la date de modification (STR_MODIFIED) est plus récente
+                INSERT INTO Building_address (
+                    egaid, id_street_locality, building_id, entrance_number,
+                    address_number, building_name, building_category, 
+                    address_status, is_official, is_valid, northing, easting,
+                    last_modification_date
+                )
+                SELECT
+                    a0.egaid, 
+                    (SELECT s2.id FROM Street__Locality s2 INNER JOIN Locality l3 ON s2.id_locality = l3.id WHERE s2.id_street = a0.id_street AND l3.postal_code_and_label = a0.postal_code_and_label),
+                    a0.building_id,
+                    a0.entrance_number,
+                    a0.address_number,
+                    a0.building_name, 
+                    a0.building_category,
+                    a0.address_status,
+                    a0.is_official,
+                    a0.is_valid,
+                    a0.northing,
+                    a0.easting,
+                    a0.last_modification_date
+                FROM
+                    t___tmp___Building_address_to_be_inserted a0
+                    LEFT JOIN Building_address a1 ON a0.egaid = a1.egaid
+                WHERE
+                    (a1.egaid IS NULL OR a0.last_modification_date > a1.last_modification_date) AND
+                    (SELECT s2.id FROM Street__Locality s2 INNER JOIN Locality l3 ON s2.id_locality = l3.id WHERE s2.id_street = a0.id_street AND l3.postal_code_and_label = a0.postal_code_and_label) IS NOT NULL
+                ON DUPLICATE KEY UPDATE 
+                    id_street_locality = VALUES(id_street_locality),
+                    building_id = VALUES(building_id),
+                    entrance_number = VALUES(entrance_number),
+                    address_number = VALUES(address_number),
+                    building_name = VALUES(building_name),
+                    building_category = VALUES(building_category),
+                    address_status = VALUES(address_status),
+                    is_official = VALUES(is_official),
+                    is_valid = VALUES(is_valid),
+                    northing = VALUES(northing),
+                    easting = VALUES(easting),
+                    last_modification_date = VALUES(last_modification_date);
+            ");
+            $this->io->success('Done !');
+
+            $this->io->info('Deletion of the temporary table...');
+            $this->connection->executeQuery(/** @lang  MySQL */ "
+                DROP TEMPORARY TABLE IF EXISTS t___tmp___Building_address_to_be_inserted;
+            ");
+            $this->io->success('Done !');
+
+            $this->connection->commit();
+        } catch (Exception $exception) {
+            $this->connection->rollBack();
+
+            dump($exception);
+
+            throw new ImportingException("building addresses");
+        }
+
+        $this->io->success('Building addresses has been imported!');
+    }
+}

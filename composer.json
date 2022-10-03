@@ -1,0 +1,47 @@
+{
+  "type": "symfony-bundle",
+  "name": "crovitche/swiss-geo-bundle",
+  "description": "Import swiss building addresses, streets and localities locally on your MySQL database using Doctrine ORM",
+  "keywords": ["doctrine", "addresses", "orm"],
+  "license": "GPL-3.0-only",
+  "authors": [
+    {
+      "name": "Thibault Gattolliat",
+      "email": "contact@thibaultg.info",
+      "homepage": "https://contact@thibaultg.info",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.1",
+    "doctrine/doctrine-bundle": "^2.1",
+    "doctrine/orm": "^2.13",
+    "guzzlehttp/guzzle": "^7.5",
+    "http-interop/http-factory-guzzle": "^1.0",
+    "league/csv": "^9.7",
+    "meilisearch/meilisearch-php": "^0.24.2",
+    "symfony/config": "6.1.*",
+    "symfony/console": "6.1.*",
+    "symfony/http-foundation": "6.1.*",
+    "symfony/form": "6.1.*",
+    "symfony/monolog-bundle": "^3.1",
+    "symfony/options-resolver": "6.1.*",
+    "symfony/lock": "6.1.*"
+  },
+  "require-dev": {
+    "jetbrains/phpstorm-attributes": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Crovitche\\SwissGeoBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Crovitche\\SwissGeoBundle\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  }
+}
