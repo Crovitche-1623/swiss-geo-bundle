@@ -1,0 +1,25 @@
+{
+  "name": "@crovitche/swiss-geo-bundle",
+  "description": "Integration of Tom Select for addresses autocomplete in Symfony",
+  "license": "GPL-3.0-only",
+  "main": "assets/controllers/tom-select_controller.js",
+  "version": "0.1.0",
+  "symfony": {
+    "controllers": {
+      "tom-select": {
+        "main": "controllers/tom-select_controller.js",
+        "webpackMode": "eager",
+        "fetch": "eager",
+        "enabled": true
+      }
+    }
+  },
+  "peerDependencies": {
+    "@hotwired/stimulus": "^3.0.0",
+    "tom-select": "^2.2.1"
+  },
+  "devDependencies": {
+    "@hotwired/stimulus": "^3.0.0",
+    "tom-select": "^2.2.1"
+  }
+}
