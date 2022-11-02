@@ -14,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class GenerateDocumentCommand extends Command
 {
-    protected static $defaultName = 'swiss-geo-bundle:import:meilisearch:documents:generate:topography';
+    protected static $defaultName = 'swiss-geo-bundle:import:meilisearch:documents:generate';
 
     public function __construct(
         private readonly Connection $connection,
@@ -52,7 +52,7 @@ class GenerateDocumentCommand extends Command
                 a0.address_number AS address_number,
                 a0.northing as northing,
                 a0.easting as easting
-            FROM Address a0
+            FROM Building_address a0
                 INNER JOIN Street__Locality s1 ON a0.id_street_locality = s1.id
                 INNER JOIN Street s2 ON s1.id_street = s2.esid
                 INNER JOIN Locality l3 ON s1.id_locality = l3.id

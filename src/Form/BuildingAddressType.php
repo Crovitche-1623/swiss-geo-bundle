@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Crovitche\SwissGeoBundle\Form;
 
 use Crovitche\SwissGeoBundle\Entity\BuildingAddress;
-use App\Form\Type\Select2RemoteEntityType;
+use Crovitche\SwissGeoBundle\Form\Type\RemoteEntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -17,23 +16,33 @@ class BuildingAddressType extends AbstractType
 {
     /**
      * {@inheritDoc}
+     *
+     * @static
      */
-    public function buildForm(
-        FormBuilderInterface $builder,
-        array $options
-    ): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $builder
-            ->add('number', Select2RemoteEntityType::class, [
-                'class' => BuildingAddress::class,
-                'attr' => [
-                    'class' => 'meilisearch-select2-remote-single',
-                    'data-controller' => 'meilisearch-select2-remote-single'
-                ],
-                'autocomplete-url' => 'http://localhost:7700/indexes/addresses/search',
-                'payload-name' => 'q',
-                'mapped' => false
-            ]);
+        $resolver->setDefaults([
+            'class' => BuildingAddress::class,
+            'attr' => [
+                'autocomplete' => false,
+                'class' => '',
+                'data-controller' => 'crovitche--swiss-geo-bundle--tom-select',
+                'data-crovitche--swiss-geo-bundle--tom-select-url-value' => 'http://localhost:7700/indexes/addresses/search'
+            ],
+            'autocomplete-url' => 'http://localhost:7700/indexes/addresses/search',
+            'payload-name' => 'q',
+            'choice_label' => static function (?BuildingAddress $address): string {
+                $streetLocality = $address?->getStreetLocality();
+                $locality = $streetLocality?->getLocality();
+
+                return
+                    $streetLocality?->getStreet()?->getName().' '.
+                    $address?->getNumber().' '.
+                    $locality?->postalCodeAndLabel.' ('.
+                    $locality?->regionAbbreviation.')'
+                ;
+            }
+        ]);
     }
 
     /**
@@ -41,10 +50,8 @@ class BuildingAddressType extends AbstractType
      *
      * @static
      */
-    public function configureOptions(OptionsResolver $resolver): void
+    public function getParent(): string
     {
-        $resolver->setDefaults([
-            'data_class' => BuildingAddress::class
-        ]);
+        return RemoteEntityType::class;
     }
 }

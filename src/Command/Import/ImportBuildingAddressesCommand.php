@@ -11,6 +11,7 @@ use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Extractor;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,6 +20,10 @@ use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Import the swiss building addresses from cadastre.ch'
+)]
 class ImportBuildingAddressesCommand extends Command
 {
     use LockableTrait;
@@ -34,29 +39,16 @@ class ImportBuildingAddressesCommand extends Command
         private readonly Connection $connection,
         private readonly ExtractZipFromServerService $extractZipFromServer,
         private readonly LoggerInterface $logger,
-        private readonly CheckTimestampInFolderService $checkTimestampInZip
-    )
-    {
+        private readonly CheckTimestampInFolderService $checkTimestampInZip,
+        private readonly string $buildingAddressesUrl
+    ) {
         parent::__construct();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function configure(): void
-    {
-        $this
-            ->setName(self::COMMAND_NAME)
-            ->setDescription('Import the swiss building addresses from cadastre.ch');
     }
 
     /**
      * @throws  TransportExceptionInterface
      */
-    public function execute(
-        InputInterface  $input,
-        OutputInterface $output
-    ): int
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!$this->lock()) {
             $output->writeln(
@@ -72,7 +64,7 @@ class ImportBuildingAddressesCommand extends Command
         $this->io = new SymfonyStyle($input, $output);
 
         $this->extractor->extractFromWeb(
-            "https://data.geo.admin.ch/ch.swisstopo.amtliches-gebaeudeadressverzeichnis/csv/2056/ch.swisstopo.amtliches-gebaeudeadressverzeichnis.zip",
+            $this->buildingAddressesUrl,
             function (): void {
                 ($this->checkTimestampInZip)($this->io, self::ADDRESSES_CACHE_NAME, '/var/lib/mysql-files');
                 $this->insertDataFromCsvFile();

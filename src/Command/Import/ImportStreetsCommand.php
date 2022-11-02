@@ -12,6 +12,7 @@ use Doctrine\DBAL\Exception;
 use League\Csv\Reader;
 use League\Csv\Writer;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +21,10 @@ use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
+#[AsCommand(
+    name: 'swiss-geo-bundle:import:streets',
+    description: 'Import the swiss street from the swisstopo'
+)]
 class ImportStreetsCommand extends Command
 {
     use LockableTrait;
@@ -29,25 +34,14 @@ class ImportStreetsCommand extends Command
     private OutputStyle $io;
 
     public function __construct(
-        private readonly Extractor                     $extractor,
+        private readonly Extractor $extractor,
         private readonly CheckTimestampInFolderService $checkTimestampInZip,
-        private readonly Connection                    $connection,
-        private readonly ExtractZipFromServerService   $extractZipFromServer,
-        private readonly LoggerInterface               $logger
-    )
-    {
+        private readonly Connection $connection,
+        private readonly ExtractZipFromServerService $extractZipFromServer,
+        private readonly LoggerInterface $logger,
+        private readonly string $streetsUrl
+    ) {
         parent::__construct();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function configure(): void
-    {
-        $this
-            ->setName('swiss-geo-bundle:import:streets')
-            ->setDescription('Import the swiss street from the swisstopo')
-        ;
     }
 
     /**
@@ -64,7 +58,7 @@ class ImportStreetsCommand extends Command
         $this->io = new SymfonyStyle($input, $output);
 
         $this->extractor->extractFromWeb(
-            "https://data.geo.admin.ch/ch.swisstopo.amtliches-strassenverzeichnis/csv/2056/ch.swisstopo.amtliches-strassenverzeichnis.zip",
+            $this->streetsUrl,
             function (): void {
                 ($this->checkTimestampInZip)($this->io, self::STREETS_CACHE_NAME, '/var/lib/mysql-files');
                 $this->createCsvForBulkInsert('/var/lib/mysql-files');

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Crovitche\SwissGeoBundle;
 
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -15,6 +16,25 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
  */
 class CrovitcheSwissGeoBundle extends AbstractBundle
 {
+    private const LOCALITIES_URL = 'https://data.geo.admin.ch/ch.swisstopo-vd.ortschaftenverzeichnis_plz/PLZO_CSV_LV95.zip';
+    private const STREETS_URL = 'https://data.geo.admin.ch/ch.swisstopo.amtliches-strassenverzeichnis/csv/2056/ch.swisstopo.amtliches-strassenverzeichnis.zip';
+    private const BUILDING_ADDRESSES_URL = 'https://data.geo.admin.ch/ch.swisstopo.amtliches-gebaeudeadressverzeichnis/csv/2056/ch.swisstopo.amtliches-gebaeudeadressverzeichnis.zip';
+
+    public function configure(DefinitionConfigurator $definition): void
+    {
+        $definition->rootNode()
+            ->children()
+                ->arrayNode('import')
+                    ->children()
+                        ->scalarNode('localities_url')->defaultValue(self::LOCALITIES_URL)->end()
+                        ?->scalarNode('streets_url')->defaultValue(self::STREETS_URL)->end()
+                        ?->scalarNode('building_addresses_url')->defaultValue(self::BUILDING_ADDRESSES_URL)->end()
+                    ?->end()
+                ->end()
+            ->end()
+        ;
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -27,5 +47,9 @@ class CrovitcheSwissGeoBundle extends AbstractBundle
     ): void {
         $loader = new YamlFileLoader($builder, new FileLocator(dirname(__DIR__).'/config'));
         $loader->load('services.yaml');
+
+        $builder->setParameter('crovitche_swiss_geo.import.localities_url', $config['import']['localities_url']);
+        $builder->setParameter('crovitche_swiss_geo.import.streets_url', $config['import']['streets_url']);
+        $builder->setParameter('crovitche_swiss_geo.import.building_addresses_url', $config['import']['building_addresses_url']);
     }
 }

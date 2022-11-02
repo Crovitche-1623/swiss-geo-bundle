@@ -8,6 +8,7 @@ use Crovitche\SwissGeoBundle\Command\Service\ExtractZipFromServerService;
 use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Extractor;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception as DBALException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\LockableTrait;
 use Psr\Log\LoggerInterface;
@@ -17,6 +18,10 @@ use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Import the swiss localities from cadastre.ch'
+)]
 class ImportLocalitiesCommand extends Command
 {
     use LockableTrait;
@@ -29,21 +34,10 @@ class ImportLocalitiesCommand extends Command
         private readonly Extractor $extractor,
         private readonly Connection $connection,
         private readonly ExtractZipFromServerService $extractZipFromServer,
-        private readonly LoggerInterface $logger
-    )
-    {
+        private readonly LoggerInterface $logger,
+        private readonly string $localitiesUrl
+    ) {
         parent::__construct();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function configure(): void
-    {
-        $this
-            ->setName(self::COMMAND_NAME)
-            ->setDescription('Import the swiss localities from cadastre.ch')
-        ;
     }
 
     /**
@@ -62,7 +56,7 @@ class ImportLocalitiesCommand extends Command
         $this->io->note('If this command produce foreign key constraint error, it probably means that you already ran it once.');
 
         $this->extractor->extractFromWeb(
-            'https://data.geo.admin.ch/ch.swisstopo-vd.ortschaftenverzeichnis_plz/PLZO_CSV_LV95.zip',
+            $this->localitiesUrl,
             function (): void {
                 $this->insertDataFromCsvFile();
             },

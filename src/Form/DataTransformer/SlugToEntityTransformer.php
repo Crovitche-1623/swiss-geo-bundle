@@ -53,8 +53,12 @@ class SlugToEntityTransformer implements DataTransformerInterface
      *
      * @throws  NonUniqueResultException
      */
-    public function reverseTransform(mixed $value): object
+    public function reverseTransform(mixed $value): ?object
     {
+        if (!$value) {
+            return null;
+        }
+
         $identifierColumn = !method_exists($this->className, 'getSlug') ? 'id' : 'slug';
 
         if (!$this->queryBuilder) {

@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * @author  Thibault Gattolliat
  */
-class Select2RemoteEntityType extends AbstractType
+class RemoteEntityType extends AbstractType
 {
     #[Pure]
     public function __construct(
@@ -131,9 +131,8 @@ class Select2RemoteEntityType extends AbstractType
 
                 return (string) $object->getId();
             },
-            'attr' => [
-                'class' => 'select2-remote-single',
-                'data-controller' => 'select2-remote-single'
+            'class' => [
+                ''
             ]
         ]);
     }
