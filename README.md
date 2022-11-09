@@ -21,9 +21,9 @@ SwissGeoBundle requires the following:
  - MySQL 8.0 or higher (other RDBMS coming soon...) with this options activated:
    - LOAD DATA INFILE https://dev.mysql.com/doc/refman/8.0/en/load-data-local-security.html
  - PHP 8.1 or higher
- - Symfony 6.1 or higher
+ - Symfony components specified in `composer.json`
  - Doctrine ORM entities (Doctrine ODM is not supported)
- - Meilisearch v0.28 (Necessary for full address search (performance too low otherwise)
+ - Meilisearch v0.28 - Necessary for full address search (performance too low otherwise)
 
 # Installation
 
@@ -51,7 +51,8 @@ updated regularly.
 ## 1. Configure your entity
 ```php
 <?php
-// src/Entity/Customer.php
+
+declare(strict_types=1);
 
 namespace App\Entity;
 
@@ -59,6 +60,8 @@ use Crovitche\SwissGeoBundle\Entity\BuildingAddress;
 use Doctrine\ORM\Mapping as ORM;
 
 //...
+#[ORM\Entity(CustomerRepository::class), ORM\Table("Customer")]
+#[ORM\Index(["egaid"], name: "IX___Customer___building_address")]
 class Customer
 {
     //...
@@ -68,27 +71,71 @@ class Customer
 }
 ```
 
-## 2. Import data
+## 2. Create a database migration.
+To do this, you have to use [DoctrineMigrationBundle](https://symfony.com/bundles/DoctrineMigrationsBundle/current/index.html).
 
+Generate a migration using [Maker bundle](https://symfony.com/bundles/SymfonyMakerBundle/current/index.html).
+```console
+php bin/console make:migration
+```
+
+This command will automatically generate the SQL you in a migration php file.
+
+Check the created migration and add this piece of code if it does not exist :
+```php
+    public function up(Schema $schema): void
+    {
+        // ...
+        $this->addSql(/** @lang MySQL */'
+            ALTER TABLE Building_address
+                ADD CONSTRAINT CK___Building_address___building_name__xor__address_number
+                    CHECK ((building_name IS NOT NULL XOR address_number IS NOT NULL) OR (building_name IS NULL AND address_number IS NULL));
+        ');
+        // ...
+    }
+
+    public function down(Schema $schema): void
+    {
+        // ...
+        $this->addSql(/** @lang MySQL */'
+            ALTER TABLE Building_address DROP CONSTRAINT CK___Building_address___building_name__xor__address_number;
+        ');
+        // ...
+    }
+
+    public function isTransactional(): bool
+    {
+        return false;
+    }
+```
+
+
+## 3. Execute the migration
+
+```console
+php bin/console doctrine:migrations:migrate -n
+```
+
+## 4. Import data
 Note: you can also run the following commands in a cron job so that your data is
 regularly updated.
 
-### 2.1 Localities
+### 4.1 Localities
 ```console
 php bin/console swiss-geo-bundle:import:localities --no-debug
 ```
 
-### 2.2 Streets
+### 4.2 Streets
 ```console
 php bin/console swiss-geo-bundle:import:streets --no-debug
 ```
 
-### 2.3 Building addresses
+### 4.3 Building addresses
 ```console
 php bin/console swiss-geo-bundle:import:building-addresses --no-debug
 ```
 
-### 2.4 Generate/update documents in Meilisearch
+### 4.4 Generate/update documents in Meilisearch
 ```console
 php bin/console swiss-geo-bundle:import:meilisearch:documents:generate --no-debug
 ```
