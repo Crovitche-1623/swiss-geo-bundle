@@ -10,7 +10,11 @@
         "main": "controllers/tom-select_controller.js",
         "webpackMode": "eager",
         "fetch": "eager",
-        "enabled": true
+        "enabled": true,
+        "autoimport": {
+          "tom-select/dist/js/tom-select.complete.js": true,
+          "tom-select/dist/css/tom-select.css": true
+        }
       }
     }
   },
