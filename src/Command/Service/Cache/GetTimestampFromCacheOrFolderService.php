@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Crovitche\SwissGeoBundle\Command\Service;
+namespace Crovitche\SwissGeoBundle\Command\Service\Cache;
 
 use Crovitche\SwissGeoBundle\Command\Service\Exception\LocalTimestampMoreRecentException;
 use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\SysGetTempDir;
@@ -17,7 +17,7 @@ use Symfony\Contracts\Cache\ItemInterface;
  * Responsible for throwing an exception if the timestamp in file is not newer
  * than the one in cache
  */
-class CheckTimestampInFolderService
+class GetTimestampFromCacheOrFolderService
 {
     private const DEFAULT_TIMESTAMP_FILENAME = 'timestamp.txt';
     private const TIMESTAMP_FORMAT_REGEX = '/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/';
@@ -32,6 +32,8 @@ class CheckTimestampInFolderService
     /**
      * @throws  InvalidArgumentException
      * @throws  LocalTimestampMoreRecentException
+     *
+     * @return  string  The timestamp from file
      */
     public function __invoke(
         OutputStyle $io,
@@ -39,8 +41,7 @@ class CheckTimestampInFolderService
         string|\Stringable|SysGetTempDir $directory = new SysGetTempDir(),
         string $filename = self::DEFAULT_TIMESTAMP_FILENAME,
         string $timestampRegex = self::TIMESTAMP_FORMAT_REGEX,
-    ): void
-    {
+    ): string {
         $finder = (new Finder)->files()->in((string) $directory)
             ->name($filename)
             ->contains($timestampRegex);
@@ -71,10 +72,10 @@ class CheckTimestampInFolderService
         if ($this->timestampDidNotExistLocally) {
             $io->info(
                 "No locally existing timestamp $cacheKeyName. The received " .
-                "($timestampFromFile) has been written..."
+                "($timestampFromFile) will be used..."
             );
 
-            return;
+            return $timestampFromFile;
         }
 
         if ($timestampFromCache >= $timestampFromFile) {
@@ -88,15 +89,6 @@ class CheckTimestampInFolderService
             "The import continues."
         );
 
-         // Invalidate cache and recreate it with new timestamp
-        $this->cache->delete($cacheKeyName);
-        $this->cache->get(
-            $cacheKeyName,
-            static function (ItemInterface $item)
-            use ($timestampFromFile): string {
-                $item->expiresAfter(null);
-                return $timestampFromFile;
-            }
-        );
+        return $timestampFromFile;
     }
 }

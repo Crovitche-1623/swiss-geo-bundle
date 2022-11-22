@@ -9,7 +9,7 @@ use JetBrains\PhpStorm\Pure;
 /**
  * @author  Thibault Gattolliat
  */
-class ImportingException extends \RuntimeException
+class InternalImportingException extends \RuntimeException
 {
     #[Pure]
     public function __construct(readonly string $subject)

@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Crovitche\SwissGeoBundle\Command\Import;
 
-use Crovitche\SwissGeoBundle\Command\Import\Exception\ImportingException;
-use Crovitche\SwissGeoBundle\Command\Service\CheckTimestampInFolderService;
+use Crovitche\SwissGeoBundle\Command\Import\Exception\InternalImportingException;
+use Crovitche\SwissGeoBundle\Command\Service\Cache\GetTimestampFromCacheOrFolderService;
+use Crovitche\SwissGeoBundle\Command\Service\Cache\WriteCacheWithTimestampService;
 use Crovitche\SwissGeoBundle\Command\Service\ExtractZipFromServerService;
 use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Extractor;
 use Doctrine\DBAL\Connection;
@@ -39,7 +40,8 @@ class ImportBuildingAddressesCommand extends Command
         private readonly Connection $connection,
         private readonly ExtractZipFromServerService $extractZipFromServer,
         private readonly LoggerInterface $logger,
-        private readonly CheckTimestampInFolderService $checkTimestampInZip,
+        private readonly GetTimestampFromCacheOrFolderService $timestampService,
+        private readonly WriteCacheWithTimestampService $writeCacheWithTimestamp,
         private readonly string $buildingAddressesUrl
     ) {
         parent::__construct();
@@ -66,8 +68,9 @@ class ImportBuildingAddressesCommand extends Command
         $this->extractor->extractFromWeb(
             $this->buildingAddressesUrl,
             function (): void {
-                ($this->checkTimestampInZip)($this->io, self::ADDRESSES_CACHE_NAME, '/var/lib/mysql-files');
+                $timestamp = ($this->timestampService)($this->io, self::ADDRESSES_CACHE_NAME, '/var/lib/mysql-files');
                 $this->insertDataFromCsvFile();
+                ($this->writeCacheWithTimestamp)(self::ADDRESSES_CACHE_NAME, $timestamp);
             },
             "/var/lib/mysql-files"
         );
@@ -201,12 +204,10 @@ class ImportBuildingAddressesCommand extends Command
             $this->io->success('Done !');
 
             $this->connection->commit();
-        } catch (Exception $exception) {
+        } catch (Exception) {
             $this->connection->rollBack();
 
-            dump($exception);
-
-            throw new ImportingException("building addresses");
+            throw new InternalImportingException("building addresses");
         }
 
         $this->io->success('Building addresses has been imported!');

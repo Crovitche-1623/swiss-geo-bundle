@@ -119,7 +119,6 @@ class GenerateDocumentCommand extends Command
 
         if (\count($memory) > 0) {
             $client->index('addresses')->addDocuments($memory);
-            $memory = [];
         }
 
         $progressBar->finish();
