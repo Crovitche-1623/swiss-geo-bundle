@@ -10,16 +10,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/streets', name: 'swissgeo_api_streets_')]
 class StreetApiController extends AbstractController
 {
+    public function __construct(
+        private readonly StreetRepository $repository,
+        private readonly RequestStack $requestStack
+    )
+    {}
+
     #[Route('/', name: 'index', methods: ['GET'])]
-    public function index(
-        StreetRepository $repository,
-        Request $request
-    ): JsonResponse {
+    public function index(): JsonResponse
+    {
+        /** @var  Request  $request */
+        $request = $this->requestStack->getCurrentRequest();
+
         $locality = $request->query->get('locality');
 
         if (!$locality) {
@@ -28,7 +36,7 @@ class StreetApiController extends AbstractController
 
         $formattedResponse = [];
 
-        $streets = $repository->findAllByLocality(
+        $streets = $this->repository->findAllByLocality(
             localityId: (int) $locality,
             name: $request->query->get('name')
         );

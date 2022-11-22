@@ -10,16 +10,24 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/localities', name: 'swissgeo_api_localities_')]
 class LocalityApiController extends AbstractController
 {
+    public function __construct(
+        private readonly LocalityRepository $repository,
+        private readonly RequestStack $requestStack
+    )
+    {}
+
     #[Route('/', name: 'index', methods: ['GET'])]
-    public function index(
-        LocalityRepository $repository,
-        Request $request
-    ): JsonResponse {
+    public function index(): JsonResponse
+    {
+        /** @var  Request  $request */
+        $request = $this->requestStack->getCurrentRequest();
+
         $regionAbbreviation = $request->query->get('region_abbreviation');
         $postalCodeAndLabel = $request->query->get('postal_code_and_label');
 
@@ -28,7 +36,7 @@ class LocalityApiController extends AbstractController
             throw new BadRequestException("Wrong region abbreviation format");
         }
 
-        $localities = $repository->findAllBySearchCriteria(
+        $localities = $this->repository->findAllBySearchCriteria(
             $regionAbbreviation,
             $postalCodeAndLabel
         );
