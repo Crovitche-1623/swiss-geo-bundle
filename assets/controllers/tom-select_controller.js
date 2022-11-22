@@ -15,23 +15,25 @@ export default class extends Controller {
     new TomSelect(this.element, {
       valueField: 'egaid',
       labelField: 'title',
-      // TODO: It's not possible to just get the data without searching ?????
-      searchField: ['title'],
+      searchField: [],
       create: false,
       maxOptions: 7,
       hideSelected: true,
 
       // Minimum query length
       shouldLoad: function (query) {
-        return query.length >= 2;
+        return query.length >= 2
       },
 
       // Fetch remote data
       load: function (query, callback) {
         const url = parent.urlValue + '?q=' + encodeURIComponent(query)
+
         fetch(url)
           .then(response => response.json())
           .then(json => {
+            this.clearOptions()
+
             callback(json.hits)
           }).catch(() => {
             callback()
