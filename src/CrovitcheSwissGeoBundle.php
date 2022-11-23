@@ -59,6 +59,7 @@ class CrovitcheSwissGeoBundle extends AbstractBundle
         $loader = new YamlFileLoader($builder, new FileLocator(dirname(__DIR__).'/config'));
         $loader->load('services.yaml');
 
+        $builder->setParameter('crovitche_swiss_geo.meilisearch_url', $config['meilisearch_url']);
         $builder->setParameter('crovitche_swiss_geo.import.localities_url', $config['import']['localities_url']);
         $builder->setParameter('crovitche_swiss_geo.import.streets_url', $config['import']['streets_url']);
         $builder->setParameter('crovitche_swiss_geo.import.building_addresses_url', $config['import']['building_addresses_url']);
