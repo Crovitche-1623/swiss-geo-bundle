@@ -2,7 +2,7 @@
   "type": "symfony-bundle",
   "name": "crovitche/swiss-geo-bundle",
   "description": "Import swiss building addresses, streets and localities locally on your MySQL database using Doctrine ORM",
-  "keywords": ["doctrine", "addresses", "orm", "symfonx-ux"],
+  "keywords": ["doctrine", "addresses", "orm", "symfony-ux"],
   "license": "GPL-3.0-only",
   "authors": [
     {
