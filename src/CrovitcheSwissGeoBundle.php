@@ -19,6 +19,7 @@ class CrovitcheSwissGeoBundle extends AbstractBundle
     private const LOCALITIES_URL = 'https://data.geo.admin.ch/ch.swisstopo-vd.ortschaftenverzeichnis_plz/PLZO_CSV_LV95.zip';
     private const STREETS_URL = 'https://data.geo.admin.ch/ch.swisstopo.amtliches-strassenverzeichnis/csv/2056/ch.swisstopo.amtliches-strassenverzeichnis.zip';
     private const BUILDING_ADDRESSES_URL = 'https://data.geo.admin.ch/ch.swisstopo.amtliches-gebaeudeadressverzeichnis/csv/2056/ch.swisstopo.amtliches-gebaeudeadressverzeichnis.zip';
+    private const MEILISEARCH_URL = 'http://localhost:7071';
 
     public function configure(DefinitionConfigurator $definition): void
     {
@@ -26,12 +27,25 @@ class CrovitcheSwissGeoBundle extends AbstractBundle
             ->children()
                 ->arrayNode('import')
                     ->children()
-                        ->scalarNode('localities_url')->defaultValue(self::LOCALITIES_URL)->end()
-                        ?->scalarNode('streets_url')->defaultValue(self::STREETS_URL)->end()
-                        ?->scalarNode('building_addresses_url')->defaultValue(self::BUILDING_ADDRESSES_URL)->end()
+                        ->scalarNode('localities_url')
+                            ->isRequired()
+                            ->defaultValue(self::LOCALITIES_URL)
+                        ->end()
+                        ?->scalarNode('streets_url')
+                            ->isRequired()
+                            ->defaultValue(self::STREETS_URL)
+                        ->end()
+                        ?->scalarNode('building_addresses_url')
+                            ->isRequired()
+                            ->defaultValue(self::BUILDING_ADDRESSES_URL)
+                        ->end()
                     ?->end()
                 ->end()
-            ->end()
+                ->scalarNode('meilisearch_url')
+                    ->isRequired()
+                    ->defaultValue(self::MEILISEARCH_URL)
+                ->end()
+            ?->end()
         ;
     }
 
