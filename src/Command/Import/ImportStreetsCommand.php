@@ -147,7 +147,7 @@ class ImportStreetsCommand extends Command
                 CREATE TEMPORARY TABLE t___tmp___Street_to_be_inserted (
                     esid INT(11) PRIMARY KEY NOT NULL,
                     label VARCHAR(150) NOT NULL,
-                    type VARCHAR(6) NOT NULL,
+                    type VARCHAR(6),
                     completion_status VARCHAR(8) NOT NULL,
                     is_official TINYINT(1) NOT NULL,
                     is_valid TINYINT(1) NOT NULL,

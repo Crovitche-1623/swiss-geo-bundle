@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Crovitche\SwissGeoBundle\Entity;
 
 use Crovitche\SwissGeoBundle\Repository\StreetRepository;
-use DateTimeImmutable;
 use Doctrine\Common\Collections\{ArrayCollection, Collection};
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -41,9 +40,14 @@ class Street extends AbstractEntity
     #[ORM\OneToMany("street", StreetLocality::class, orphanRemoval: true)]
     private Collection $streetLocality;
 
-    #[ORM\Column(length: 6, enumType: Type::class, options: [
-        "comment" => "Genre d’objet (rue, place ou autre)"
-    ])]
+    #[ORM\Column(
+        length: 6,
+        nullable: true,
+        enumType: Type::class,
+        options: [
+            "comment" => "Genre d’objet (rue, place ou autre)"
+        ]
+    )]
     private ?Type $type = null;
 
     #[ORM\Column(
@@ -76,7 +80,7 @@ class Street extends AbstractEntity
     #[ORM\Column(type: Types::DATE_IMMUTABLE, options: ["comment" =>
         "Date de la dernière modification de la rue"
     ])]
-    private ?DateTimeImmutable $lastModificationDate = null;
+    private ?\DateTimeImmutable $lastModificationDate = null;
 
     #[Pure]
     public function __construct()
@@ -107,7 +111,7 @@ class Street extends AbstractEntity
         return $this->type;
     }
 
-    public function setType(Type $type): self
+    public function setType(?Type $type): self
     {
         $this->type = $type;
 
@@ -158,12 +162,12 @@ class Street extends AbstractEntity
         return $this->streetLocality;
     }
 
-    public function getLastModificationDate(): ?DateTimeImmutable
+    public function getLastModificationDate(): ?\DateTimeImmutable
     {
         return $this->lastModificationDate;
     }
 
-    public function setLastModificationDate(DateTimeImmutable $lastModificationDate): self
+    public function setLastModificationDate(\DateTimeImmutable $lastModificationDate): self
     {
         $this->lastModificationDate = $lastModificationDate;
 
