@@ -102,8 +102,8 @@ class ImportBuildingAddressesCommand extends Command
                     completion_status VARCHAR(8) NOT NULL,
                     is_official TINYINT(1) NOT NULL,
                     is_valid TINYINT(1) NOT NULL,
-                    northing INT(11) DEFAULT NULL,
-                    easting INT(11) DEFAULT NULL,
+                    lv95_northing INT(11) DEFAULT NULL,
+                    lv95_easting INT(11) DEFAULT NULL,
                     last_modification_date DATE NOT NULL
                 );");
             $this->io->success('Done !');
@@ -132,8 +132,8 @@ class ImportBuildingAddressesCommand extends Command
                         completion_status = @ADR_STATUS,
                         is_official = IF(@ADR_OFFICIAL = 'true', 1, 0),
                         is_valid = IF(@ADR_VALID = 'true', 1, 0),
-                        northing = @ADR_NORTHING,
-                        easting = @ADR_EASTING,
+                        lv95_northing = @ADR_NORTHING,
+                        lv95_easting = @ADR_EASTING,
                         last_modification_date = STR_TO_DATE(@ADR_MODIFIED, '%d.%m.%Y');
             ");
 
@@ -158,8 +158,8 @@ class ImportBuildingAddressesCommand extends Command
                 INSERT INTO Building_address (
                     egaid, id_street_locality, building_id, entrance_number,
                     address_number, building_name, building_category,
-                    completion_status, is_official, is_valid, northing, easting,
-                    last_modification_date
+                    completion_status, is_official, is_valid, lv95_northing,
+                    lv95_easting, last_modification_date
                 )
                 SELECT
                     a0.egaid, 
@@ -172,8 +172,8 @@ class ImportBuildingAddressesCommand extends Command
                     a0.completion_status,
                     a0.is_official,
                     a0.is_valid,
-                    a0.northing,
-                    a0.easting,
+                    a0.lv95_northing,
+                    a0.lv95_easting,
                     a0.last_modification_date
                 FROM
                     t___tmp___Building_address_to_be_inserted a0
@@ -191,8 +191,8 @@ class ImportBuildingAddressesCommand extends Command
                     completion_status = VALUES(completion_status),
                     is_official = VALUES(is_official),
                     is_valid = VALUES(is_valid),
-                    northing = VALUES(northing),
-                    easting = VALUES(easting),
+                    lv95_northing = VALUES(lv95_northing),
+                    lv95_easting = VALUES(lv95_easting),
                     last_modification_date = VALUES(last_modification_date);
             ");
             $this->io->success('Done !');
