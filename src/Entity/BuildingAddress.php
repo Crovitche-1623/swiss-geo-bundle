@@ -67,10 +67,10 @@ class BuildingAddress extends AbstractEntity
     ])]
     private ?BuildingCategory $buildingCategory = null;
 
-    #[ORM\Column("address_status", length: 8,
+    #[ORM\Column("completion_status", length: 8,
         enumType: StreetOrAddressStatus::class,
         options: [
-            "comment" => "Etat de réalisation de l’adresse selon le RegBL"
+            "comment" => "État de réalisation de l’adresse selon le RegBL"
         ]
     )]
     private ?StreetOrAddressStatus $status = null;

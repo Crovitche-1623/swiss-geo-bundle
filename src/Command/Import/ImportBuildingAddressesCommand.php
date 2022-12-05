@@ -99,7 +99,7 @@ class ImportBuildingAddressesCommand extends Command
                     address_number VARCHAR(12) DEFAULT NULL,
                     building_name VARCHAR(50) DEFAULT NULL,
                     building_category VARCHAR(18) NOT NULL,
-                    address_status VARCHAR(8) NOT NULL,
+                    completion_status VARCHAR(8) NOT NULL,
                     is_official TINYINT(1) NOT NULL,
                     is_valid TINYINT(1) NOT NULL,
                     northing INT(11) DEFAULT NULL,
@@ -129,7 +129,7 @@ class ImportBuildingAddressesCommand extends Command
                         building_category = @BDG_CATEGORY,
                         building_name = NULLIF(@BDG_NAME, ''),
                         postal_code_and_label = @ZIP_LABEL,
-                        address_status = @ADR_STATUS,
+                        completion_status = @ADR_STATUS,
                         is_official = IF(@ADR_OFFICIAL = 'true', 1, 0),
                         is_valid = IF(@ADR_VALID = 'true', 1, 0),
                         northing = @ADR_NORTHING,
@@ -157,8 +157,8 @@ class ImportBuildingAddressesCommand extends Command
                 # Les données sont remplacés si la date de modification (STR_MODIFIED) est plus récente
                 INSERT INTO Building_address (
                     egaid, id_street_locality, building_id, entrance_number,
-                    address_number, building_name, building_category, 
-                    address_status, is_official, is_valid, northing, easting,
+                    address_number, building_name, building_category,
+                    completion_status, is_official, is_valid, northing, easting,
                     last_modification_date
                 )
                 SELECT
@@ -169,7 +169,7 @@ class ImportBuildingAddressesCommand extends Command
                     a0.address_number,
                     a0.building_name, 
                     a0.building_category,
-                    a0.address_status,
+                    a0.completion_status,
                     a0.is_official,
                     a0.is_valid,
                     a0.northing,
@@ -188,7 +188,7 @@ class ImportBuildingAddressesCommand extends Command
                     address_number = VALUES(address_number),
                     building_name = VALUES(building_name),
                     building_category = VALUES(building_category),
-                    address_status = VALUES(address_status),
+                    completion_status = VALUES(completion_status),
                     is_official = VALUES(is_official),
                     is_valid = VALUES(is_valid),
                     northing = VALUES(northing),
