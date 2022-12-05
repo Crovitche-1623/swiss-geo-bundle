@@ -13,15 +13,26 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\MappedSuperclass]
 abstract class AbstractEntity
 {
+    /**
+     * @var  null|int<0, 4294967295>
+     */
     #[ORM\Id, ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ["unsigned" => true])]
     protected ?int $id = null;
 
+    /**
+     * @return  null|int<0, 4294967295>
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @param  null|int<0, 4294967295>  $id
+     *
+     * @return  static
+     */
     public function setId(?int $id): self
     {
         $this->id = $id;

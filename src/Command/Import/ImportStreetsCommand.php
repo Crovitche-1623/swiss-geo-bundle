@@ -148,7 +148,7 @@ class ImportStreetsCommand extends Command
                     esid INT(11) PRIMARY KEY NOT NULL,
                     label VARCHAR(150) NOT NULL,
                     type VARCHAR(6) NOT NULL,
-                    status VARCHAR(8) NOT NULL,
+                    completion_status VARCHAR(8) NOT NULL,
                     is_official TINYINT(1) NOT NULL,
                     is_valid TINYINT(1) NOT NULL,
                     last_modification_date DATE NOT NULL 
@@ -168,7 +168,7 @@ class ImportStreetsCommand extends Command
                     esid = @STR_ESID,
                     label = @STN_LABEL,
                     type = NULLIF(@STR_TYPE, ''),
-                    status = NULLIF(@STR_STATUS, ''),
+                    completion_status = NULLIF(@STR_STATUS, ''),
                     is_official = IF(@STR_OFFICIAL = 'true', 1, 0),
                     is_valid = IF(@ADR_VALID = 'true', 1, 0),
                     last_modification_date = STR_TO_DATE(@STR_MODIFIED, '%d.%m.%Y')
@@ -186,12 +186,12 @@ class ImportStreetsCommand extends Command
             // Insert les données à partir de la table d'insert si elles n'existent pas dans la table principale.
             // Les données sont remplacés si la date de modification (STR_MODIFIED) est plus récente
             $this->connection->executeQuery(/** @lang  MySQL */"
-                INSERT INTO Street (esid, label, type, status, is_official, is_valid, last_modification_date)
+                INSERT INTO Street (esid, label, type, completion_status, is_official, is_valid, last_modification_date)
                 SELECT
                     p0.esid,
                     p0.label,
                     p0.type,
-                    p0.status,
+                    p0.completion_status,
                     p0.is_official,
                     p0.is_valid,   
                     p0.last_modification_date
@@ -203,7 +203,7 @@ class ImportStreetsCommand extends Command
                 ON DUPLICATE KEY UPDATE 
                     label = VALUES(label),
                     type = VALUES(type),
-                    status = VALUES(status),
+                    completion_status = VALUES(completion_status),
                     is_official = VALUES(is_official),
                     is_valid = VALUES(is_valid),
                     last_modification_date = VALUES(last_modification_date);

@@ -46,9 +46,18 @@ class Street extends AbstractEntity
     ])]
     private ?Type $type = null;
 
-    #[ORM\Column(length: 8, enumType: StreetOrAddressStatus::class, options: [
-        "comment" => "Etat de réalisation de la rue selon le RegBL"
-    ])]
+    #[ORM\Column(
+        /**
+         * `status` is a reserved MySQL word:
+         * @see https://dev.mysql.com/doc/refman/8.0/en/keywords.html
+         */
+        name: 'completion_status',
+        length: 8,
+        enumType: StreetOrAddressStatus::class,
+        options: [
+            "comment" => "État de réalisation de la rue selon le RegBL"
+        ]
+    )]
     private ?StreetOrAddressStatus $status = null;
 
     /**

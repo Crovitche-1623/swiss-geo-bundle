@@ -37,6 +37,9 @@ class RegionRepository
         );
     }
 
+    /**
+     * @return  array<string, string>
+     */
     public static function getRegions(): array
     {
         return [
