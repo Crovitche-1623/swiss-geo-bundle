@@ -42,20 +42,39 @@ class GenerateDocumentCommand extends Command
         OutputInterface $output
     ): int {
         $addresses = $this->connection->executeQuery("
-            SELECT 
+            SELECT
                 a0.egaid as egaid,
-                CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(CONCAT(s2.label, CONCAT(' ', a0.address_number)), ' '), l3.postal_code_and_label), ' ('), l3.region_abbreviation), ')') as title,
+                CONCAT(s2.label, ' ', a0.address_number, ' ', l3.postal_code_and_label, ' (', l3.region_abbreviation, ')') as title,
                 l3.region_abbreviation as region_abbreviation,
                 l3.postal_code_and_label as postal_code_and_label,
                 s2.label as street_label,
                 LENGTH(a0.address_number) AS address_number_length,
                 a0.address_number AS address_number,
                 a0.lv95_northing as northing,
-                a0.lv95_easting as easting
+                a0.lv95_easting as easting,
+                CONCAT(
+                    'https://tile.openstreetmap.org/18/',
+                    WGS84LongitudeToOSMTile(
+                        LV95toWGSLongitude(
+                            lv95_easting,
+                            lv95_northing
+                            ),
+                        18
+                    ),
+                    '/',
+                    WGS84LatitudeToOSMTile(
+                        LV95toWGSLatitude(
+                            lv95_easting,
+                            lv95_northing
+                            ),
+                        18
+                    ),
+                    '.png'
+                ) AS tilemap_image
             FROM Building_address a0
-                INNER JOIN Street__Locality s1 ON a0.id_street_locality = s1.id
-                INNER JOIN Street s2 ON s1.id_street = s2.esid
-                INNER JOIN Locality l3 ON s1.id_locality = l3.id
+                 INNER JOIN Street__Locality s1 ON a0.id_street_locality = s1.id
+                 INNER JOIN Street s2 ON s1.id_street = s2.esid
+                 INNER JOIN Locality l3 ON s1.id_locality = l3.id
             WHERE
                 a0.address_number IS NOT NULL AND
                 s2.type <> 'outdated'
@@ -78,7 +97,7 @@ class GenerateDocumentCommand extends Command
         ]);
 
         $client->index('addresses')->updateDisplayedAttributes([
-            'egaid', 'title', 'northing', 'easting'
+            'egaid', 'title', 'northing', 'easting', 'tilemap_image'
         ]);
 
         $client->index('addresses')->updateSearchableAttributes([
