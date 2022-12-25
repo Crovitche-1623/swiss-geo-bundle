@@ -185,7 +185,7 @@ class ImportStreetsCommand extends Command
             // Insert les données à partir de la table d'insert si elles n'existent pas dans la table principale.
             // Les données sont remplacés si la date de modification (STR_MODIFIED) est plus récente
             $this->connection->executeQuery(/** @lang  MySQL */"
-                INSERT INTO Street (esid, label, type, completion_status, is_official, is_valid, last_modification_date)
+                INSERT INTO Street (esid, label, type, completion_status, is_official, last_modification_date)
                 SELECT
                     p0.esid,
                     p0.label,
@@ -203,7 +203,6 @@ class ImportStreetsCommand extends Command
                     type = VALUES(type),
                     completion_status = VALUES(completion_status),
                     is_official = VALUES(is_official),
-                    is_valid = VALUES(is_valid),
                     last_modification_date = VALUES(last_modification_date);
             ");
 
