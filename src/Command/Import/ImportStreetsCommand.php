@@ -171,7 +171,7 @@ class ImportStreetsCommand extends Command
                     completion_status = NULLIF(@STR_STATUS, ''),
                     is_official = IF(@STR_OFFICIAL = 'true', 1, 0),
                     is_valid = IF(@ADR_VALID = 'true', 1, 0),
-                    last_modification_date = IFNULL(NULLIF(@STR_MODIFIED, ''), STR_TO_DATE(@STR_MODIFIED, '%d.%m.%Y'))
+                    last_modification_date = IFNULL(NULLIF(TRIM(@STR_MODIFIED), ''), STR_TO_DATE(TRIM(@STR_MODIFIED), '%d.%m.%Y'))
                 ;
              ");
 
