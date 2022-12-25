@@ -118,7 +118,7 @@ class ImportBuildingAddressesCommand extends Command
                     ENCLOSED BY ''
                     LINES TERMINATED BY '\n'
                     IGNORE 1 LINES
-                    (@ADR_EGAID, @STR_ESID, @BDG_EGID, @ADR_EDID, @STN_LABEL, @ADR_NUMBER, @BDG_CATEGORY, @BDG_NAME, @ZIP_LABEL, @COM_FOSNR, @COM_CANTON, @ADR_STATUS, @ADR_OFFICIAL, @ADR_VALID, @ADR_MODIFIED, @ADR_EASTING, @ADR_NORTHING)
+                    (@ADR_EGAID, @STR_ESID, @BDG_EGID, @ADR_EDID, @STN_LABEL, @ADR_NUMBER, @BDG_CATEGORY, @BDG_NAME, @ZIP_LABEL, @COM_FOSNR, @COM_CANTON, @ADR_STATUS, @ADR_OFFICIAL, @ADR_MODIFIED, @ADR_EASTING, @ADR_NORTHING)
                     SET
                         egaid = @ADR_EGAID,
                         id_street = @STR_ESID,
