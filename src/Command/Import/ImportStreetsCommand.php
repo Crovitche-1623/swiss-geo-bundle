@@ -64,8 +64,9 @@ class ImportStreetsCommand extends Command
             function (): void {
                 $timestamp = ($this->timestampService)($this->io, self::STREETS_CACHE_NAME, '/var/lib/mysql-files');
                 $this->createCsvForBulkInsert('/var/lib/mysql-files');
-                $this->insertDataFromCsvFile();
-                ($this->writeCacheWithTimestamp)(self::STREETS_CACHE_NAME, $timestamp);
+                if ($this->insertDataFromCsvFile()) {
+                    ($this->writeCacheWithTimestamp)(self::STREETS_CACHE_NAME, $timestamp);
+                }
 
             },
             "/var/lib/mysql-files"
@@ -147,12 +148,12 @@ class ImportStreetsCommand extends Command
                 CREATE TEMPORARY TABLE t___tmp___Street_to_be_inserted (
                     esid INT(11) PRIMARY KEY NOT NULL,
                     label VARCHAR(150) NOT NULL,
-                    type VARCHAR(6),
+                    type VARCHAR(6) DEFAULT NULL,
                     completion_status VARCHAR(8) NOT NULL,
                     is_official TINYINT(1) NOT NULL,
                     is_valid TINYINT(1) NOT NULL,
-                    last_modification_date DATE
-                );
+                    last_modification_date DATE DEFAULT NULL
+                ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
             ");
 
             $this->connection->executeQuery(/** @lang  MySQL */"
@@ -171,7 +172,7 @@ class ImportStreetsCommand extends Command
                     completion_status = NULLIF(@STR_STATUS, ''),
                     is_official = IF(@STR_OFFICIAL = 'true', 1, 0),
                     is_valid = IF(@ADR_VALID = 'true', 1, 0),
-                    last_modification_date = NULLIF('0000-00-00', STR_TO_DATE(@STR_MODIFIED, '%d.%m.%Y'))
+                    last_modification_date = IF(@STR_MODIFIED = '', NULL, STR_TO_DATE(@STR_MODIFIED, '%d.%m.%Y'))
                 ;
              ");
 
