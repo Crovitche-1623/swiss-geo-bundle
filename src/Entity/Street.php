@@ -77,9 +77,13 @@ class Street extends AbstractEntity
     ])]
     private ?bool $isValid = null;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE, options: ["comment" =>
-        "Date de la dernière modification de la rue"
-    ])]
+    #[ORM\Column(
+        type: Types::DATE_IMMUTABLE,
+        nullable: true,
+        options: [
+            "comment" => "Date de la dernière modification de la rue"
+        ]
+    )]
     private ?\DateTimeImmutable $lastModificationDate = null;
 
     #[Pure]
@@ -167,7 +171,7 @@ class Street extends AbstractEntity
         return $this->lastModificationDate;
     }
 
-    public function setLastModificationDate(\DateTimeImmutable $lastModificationDate): self
+    public function setLastModificationDate(?\DateTimeImmutable $lastModificationDate): self
     {
         $this->lastModificationDate = $lastModificationDate;
 

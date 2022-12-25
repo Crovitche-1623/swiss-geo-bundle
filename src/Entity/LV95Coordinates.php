@@ -23,6 +23,7 @@ class LV95Coordinates
         name: 'lv95_northing',
         type: Types::INTEGER,
         length: 7,
+        nullable: true,
         options: ['unsigned' => true],
         columnDefinition: 'MEDIUMINT UNSIGNED'
     )]
@@ -35,6 +36,7 @@ class LV95Coordinates
         name: 'lv95_easting',
         type: Types::INTEGER,
         length: 7,
+        nullable: true,
         options: ['unsigned' => true],
         columnDefinition: 'MEDIUMINT UNSIGNED'
     )]

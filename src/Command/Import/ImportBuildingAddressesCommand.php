@@ -132,8 +132,8 @@ class ImportBuildingAddressesCommand extends Command
                         completion_status = @ADR_STATUS,
                         is_official = IF(@ADR_OFFICIAL = 'true', 1, 0),
                         is_valid = IF(@ADR_VALID = 'true', 1, 0),
-                        lv95_northing = @ADR_NORTHING,
-                        lv95_easting = @ADR_EASTING,
+                        lv95_northing = NULLIF(@ADR_NORTHING, ''),
+                        lv95_easting = NULLIF(@ADR_EASTING, ''),
                         last_modification_date = STR_TO_DATE(@ADR_MODIFIED, '%d.%m.%Y');
             ");
 

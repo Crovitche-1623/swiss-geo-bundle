@@ -151,7 +151,7 @@ class ImportStreetsCommand extends Command
                     completion_status VARCHAR(8) NOT NULL,
                     is_official TINYINT(1) NOT NULL,
                     is_valid TINYINT(1) NOT NULL,
-                    last_modification_date DATE NOT NULL 
+                    last_modification_date DATE
                 );
             ");
 
@@ -171,7 +171,7 @@ class ImportStreetsCommand extends Command
                     completion_status = NULLIF(@STR_STATUS, ''),
                     is_official = IF(@STR_OFFICIAL = 'true', 1, 0),
                     is_valid = IF(@ADR_VALID = 'true', 1, 0),
-                    last_modification_date = STR_TO_DATE(@STR_MODIFIED, '%d.%m.%Y')
+                    last_modification_date = NULLIF(STR_TO_DATE(@STR_MODIFIED, '%d.%m.%Y'), '0000-00-00')
                 ;
              ");
 
@@ -275,7 +275,7 @@ class ImportStreetsCommand extends Command
                  FIELDS TERMINATED BY ','
                  ENCLOSED BY '\"'
                  LINES TERMINATED BY '\n'
-                 IGNORE 1 ROWS
+                 IGNORE 1 LINES
                  (id_street, id_locality);
              ");
 
