@@ -72,11 +72,6 @@ class Street extends AbstractEntity
     ])]
     private ?bool $isOfficial = null;
 
-    #[ORM\Column(type: Types::BOOLEAN, options: ["comment" =>
-        "Fiabilité de l‘adresse selon les contrôles (checks) de swisstopo"
-    ])]
-    private ?bool $isValid = null;
-
     #[ORM\Column(
         type: Types::DATE_IMMUTABLE,
         nullable: true,
@@ -142,18 +137,6 @@ class Street extends AbstractEntity
     public function setIsOfficial(bool $isOfficial): self
     {
         $this->isOfficial = $isOfficial;
-
-        return $this;
-    }
-
-    public function getIsValid(): ?bool
-    {
-        return $this->isValid;
-    }
-
-    public function setIsValid(bool $isValid): self
-    {
-        $this->isValid = $isValid;
 
         return $this;
     }

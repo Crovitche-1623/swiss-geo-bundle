@@ -80,11 +80,6 @@ class BuildingAddress extends AbstractEntity
     ])]
     private ?bool $isOfficial = null;
 
-    #[ORM\Column(type: Types::BOOLEAN, options: ["comment" =>
-        "Fiabilité de l'adresse selon les contrôles (checks de swisstopo)"
-    ])]
-    private ?bool $isValid = null;
-
     #[ORM\Embedded(LV95Coordinates::class, columnPrefix: false)]
     private LV95Coordinates $coordinates;
 

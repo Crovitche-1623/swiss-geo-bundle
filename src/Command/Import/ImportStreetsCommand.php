@@ -151,7 +151,6 @@ class ImportStreetsCommand extends Command
                     type VARCHAR(6) DEFAULT NULL,
                     completion_status VARCHAR(8) NOT NULL,
                     is_official TINYINT(1) NOT NULL,
-                    is_valid TINYINT(1) NOT NULL,
                     last_modification_date DATE DEFAULT NULL
                 ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
             ");
@@ -164,15 +163,14 @@ class ImportStreetsCommand extends Command
                 ENCLOSED BY ''
                 LINES TERMINATED BY '\n'
                 IGNORE 1 LINES
-                (@STR_ESID, @STN_LABEL, @ZIP_LABEL, @COM_FOSNR, @COM_NAME, @COM_CANTON, @STR_TYPE, @STR_STATUS, @STR_OFFICIAL, @STR_VALID, @STR_MODIFIED, @STR_EASTING, @STR_NORTHING)
+                (@STR_ESID, @STN_LABEL, @ZIP_LABEL, @COM_FOSNR, @COM_NAME, @COM_CANTON, @STR_TYPE, @STR_STATUS, @STR_OFFICIAL, @STR_MODIFIED, @STR_EASTING, @STR_NORTHING)
                 SET
                     esid = @STR_ESID,
                     label = @STN_LABEL,
                     type = NULLIF(@STR_TYPE, ''),
                     completion_status = NULLIF(@STR_STATUS, ''),
                     is_official = IF(@STR_OFFICIAL = 'true', 1, 0),
-                    is_valid = IF(@ADR_VALID = 'true', 1, 0),
-                    last_modification_date = IF(@STR_MODIFIED = '', NULL, STR_TO_DATE(@STR_MODIFIED, '%d.%m.%Y'))
+                    last_modification_date = STR_TO_DATE(@STR_MODIFIED, '%d.%m.%Y')
                 ;
              ");
 
@@ -194,7 +192,6 @@ class ImportStreetsCommand extends Command
                     p0.type,
                     p0.completion_status,
                     p0.is_official,
-                    p0.is_valid,   
                     p0.last_modification_date
                 FROM
                     t___tmp___Street_to_be_inserted p0

@@ -101,7 +101,6 @@ class ImportBuildingAddressesCommand extends Command
                     building_category VARCHAR(18) NOT NULL,
                     completion_status VARCHAR(8) NOT NULL,
                     is_official TINYINT(1) NOT NULL,
-                    is_valid TINYINT(1) NOT NULL,
                     lv95_northing INT(11) DEFAULT NULL,
                     lv95_easting INT(11) DEFAULT NULL,
                     last_modification_date DATE NOT NULL
@@ -131,7 +130,6 @@ class ImportBuildingAddressesCommand extends Command
                         postal_code_and_label = @ZIP_LABEL,
                         completion_status = @ADR_STATUS,
                         is_official = IF(@ADR_OFFICIAL = 'true', 1, 0),
-                        is_valid = IF(@ADR_VALID = 'true', 1, 0),
                         lv95_northing = NULLIF(@ADR_NORTHING, ''),
                         lv95_easting = NULLIF(@ADR_EASTING, ''),
                         last_modification_date = STR_TO_DATE(@ADR_MODIFIED, '%d.%m.%Y');
@@ -158,7 +156,7 @@ class ImportBuildingAddressesCommand extends Command
                 INSERT INTO Building_address (
                     egaid, id_street_locality, building_id, entrance_number,
                     address_number, building_name, building_category,
-                    completion_status, is_official, is_valid, lv95_northing,
+                    completion_status, is_official, lv95_northing,
                     lv95_easting, last_modification_date
                 )
                 SELECT
@@ -171,7 +169,6 @@ class ImportBuildingAddressesCommand extends Command
                     a0.building_category,
                     a0.completion_status,
                     a0.is_official,
-                    a0.is_valid,
                     a0.lv95_northing,
                     a0.lv95_easting,
                     a0.last_modification_date
@@ -190,7 +187,6 @@ class ImportBuildingAddressesCommand extends Command
                     building_category = VALUES(building_category),
                     completion_status = VALUES(completion_status),
                     is_official = VALUES(is_official),
-                    is_valid = VALUES(is_valid),
                     lv95_northing = VALUES(lv95_northing),
                     lv95_easting = VALUES(lv95_easting),
                     last_modification_date = VALUES(last_modification_date);
