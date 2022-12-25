@@ -28,7 +28,7 @@ class GenerateDocumentCommand extends Command
     public function configure(): void
     {
         $this
-            ->setName('pesetas:import:meilisearch:documents:generate:topography')
+            ->setName(self::$defaultName)
             ->setDescription('Generate well formatted documents for meilisearch');
     }
 
