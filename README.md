@@ -24,6 +24,27 @@ SwissGeoBundle requires the following:
  - Symfony components specified in `composer.json`
  - Doctrine ORM entities (Doctrine ODM is not supported)
  - Meilisearch v0.28 - Necessary for full address search (performance too low otherwise)
+   ```yaml
+   version: '3.7'
+   
+   services:
+      meilisearch:
+          hostname: meilisearch
+          image: getmeili/meilisearch:v0.28
+          environment:
+            - MEILI_ENV=development
+            # set the max payload to 200Mb instead of 100 default one
+            # addresses file is around 170Mb
+            - MEILI_HTTP_PAYLOAD_SIZE_LIMIT=209715200
+            - MEILI_NO_ANALYTICS=true
+          ports:
+            - '7701:7700'
+          networks:
+            - network
+          volumes:
+            - meilisearch-data:/data.ms
+          restart: unless-stopped
+   ```
 
 # Installation
 
