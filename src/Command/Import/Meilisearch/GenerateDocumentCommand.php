@@ -4,32 +4,26 @@ declare(strict_types=1);
 
 namespace Crovitche\SwissGeoBundle\Command\Import\Meilisearch;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\{Connection, Exception};
 use MeiliSearch\Client;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+#[AsCommand(
+    name: self::COMMAND_NAME,
+    description: 'Generate well formatted documents for meilisearch'
+)]
 class GenerateDocumentCommand extends Command
 {
-    protected static $defaultName = 'swiss-geo-bundle:import:meilisearch:documents:generate';
+    public const COMMAND_NAME = 'swiss-geo-bundle:import:meilisearch:documents:generate';
 
     public function __construct(
         private readonly Connection $connection,
     ) {
-        parent::__construct(self::$defaultName);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function configure(): void
-    {
-        $this
-            ->setName(self::$defaultName)
-            ->setDescription('Generate well formatted documents for meilisearch');
+        parent::__construct();
     }
 
     /**
