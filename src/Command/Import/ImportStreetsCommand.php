@@ -166,7 +166,7 @@ class ImportStreetsCommand extends Command
                 (@STR_ESID, @STN_LABEL, @ZIP_LABEL, @COM_FOSNR, @COM_NAME, @COM_CANTON, @STR_TYPE, @STR_STATUS, @STR_OFFICIAL, @STR_MODIFIED, @STR_EASTING, @STR_NORTHING)
                 SET
                     esid = @STR_ESID,
-                    label = @STN_LABEL,
+                    label = TRIM(@STN_LABEL),
                     type = NULLIF(@STR_TYPE, ''),
                     completion_status = NULLIF(@STR_STATUS, ''),
                     is_official = IF(@STR_OFFICIAL = 'true', 1, 0),

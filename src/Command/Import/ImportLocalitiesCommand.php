@@ -81,9 +81,9 @@ class ImportLocalitiesCommand extends Command
                 IGNORE 1 LINES
                 (@ORTSCHAFTSNAME, @PLZ, @ZUSATZZIFFER, @GEMEINDENAME, @BFS_NR, @KANTONSKURZEL, @E, @N, @SPRACHE)
                 SET
-                    label = @ORTSCHAFTSNAME,
+                    label = TRIM(@ORTSCHAFTSNAME),
                     postal_code = @PLZ,
-                    region_abbreviation = @KANTONSKURZEL,
+                    region_abbreviation = TRIM(@KANTONSKURZEL),
                     additional_digits = @ZUSATZZIFFER
                 ;
             ");
