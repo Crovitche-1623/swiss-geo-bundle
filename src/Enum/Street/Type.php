@@ -12,7 +12,7 @@ namespace Crovitche\SwissGeoBundle\Enum\Street;
  */
 enum Type: string
 {
-    case Area = "Area";
-    case Street = "Street";
-    case Place = "Place";
+    case Area = 'Area';
+    case Street = 'Street';
+    case Place = 'Place';
 }

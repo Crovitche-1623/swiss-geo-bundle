@@ -8,14 +8,9 @@ use Crovitche\SwissGeoBundle\Form\DataTransformer\SlugToEntityTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use JetBrains\PhpStorm\Pure;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Exception\LogicException;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormView;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\{AbstractType, FormBuilderInterface, FormEvent, FormEvents, FormInterface, FormView};
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -26,8 +21,8 @@ class RemoteEntityType extends AbstractType
     #[Pure]
     public function __construct(
         private readonly EntityManagerInterface $entityManager
-    )
-    {}
+    ) {
+    }
 
     /**
      * {@inheritDoc}
@@ -38,8 +33,7 @@ class RemoteEntityType extends AbstractType
         FormView $view,
         FormInterface $form,
         array $options
-    ): void
-    {
+    ): void {
         $view->vars['attr']['data-payload-name'] = $options['payload-name'];
         $view->vars['attr']['data-autocomplete-url'] = $options['autocomplete-url'];
     }
@@ -50,8 +44,7 @@ class RemoteEntityType extends AbstractType
     public function buildForm(
         FormBuilderInterface $builder,
         array $options
-    ): void
-    {
+    ): void {
         // PRE_SET_DATA also call PRE_SET_DATA when the form is added so
         // infinite loop must be stopped using a variable
         if (false === $options['form_has_been_added']) {
@@ -71,11 +64,9 @@ class RemoteEntityType extends AbstractType
                     $options['form_has_been_added'] = true;
 
                     $parentForm = $form->getParent();
-                    $type = get_class($config->getType()->getInnerType());
+                    $type = \get_class($config->getType()->getInnerType());
                     if (!$parentForm) {
-                        throw new LogicException(
-                            message: sprintf("%s must have a parent form", $type)
-                        );
+                        throw new LogicException(message: \sprintf('%s must have a parent form', $type));
                     }
 
                     // Replace the field
@@ -125,15 +116,15 @@ class RemoteEntityType extends AbstractType
                     return '';
                 }
 
-                if (method_exists($object, 'getSlug')) {
+                if (\method_exists($object, 'getSlug')) {
                     return $object->getSlug();
                 }
 
                 return (string) $object->getId();
             },
             'class' => [
-                ''
-            ]
+                '',
+            ],
         ]);
     }
 

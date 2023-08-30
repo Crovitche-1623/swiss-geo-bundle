@@ -22,12 +22,10 @@ class RegionAbbreviationToRegionTransformer implements DataTransformerInterface
      */
     public function transform($value): string
     {
-        $abbreviation = array_search($value, RegionRepository::getRegions(), true);
+        $abbreviation = \array_search($value, RegionRepository::getRegions(), true);
 
         if (false === $abbreviation) {
-            throw new TransformationFailedException(
-                sprintf("Cannot find abbreviation for region %s.", $value)
-            );
+            throw new TransformationFailedException(\sprintf('Cannot find abbreviation for region %s.', $value));
         }
 
         return $abbreviation;
@@ -42,10 +40,8 @@ class RegionAbbreviationToRegionTransformer implements DataTransformerInterface
      */
     public function reverseTransform($value): string
     {
-        if (!array_key_exists($value, RegionRepository::getRegions())) {
-            throw new TransformationFailedException(
-                sprintf("Cannot find region for abbreviation %s", $value)
-            );
+        if (!\array_key_exists($value, RegionRepository::getRegions())) {
+            throw new TransformationFailedException(\sprintf('Cannot find region for abbreviation %s', $value));
         }
 
         return RegionRepository::getRegions()[$value];

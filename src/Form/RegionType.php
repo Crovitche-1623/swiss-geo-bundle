@@ -23,9 +23,9 @@ class RegionType extends AbstractType
             // Merging would be better instead of overriding
             'attr' => [
                 'class' => 'select2-single',
-                'data-controller' => 'select2-single region-type'
+                'data-controller' => 'select2-single region-type',
             ],
-            'choices' => array_flip(RegionRepository::getRegions()),
+            'choices' => \array_flip(RegionRepository::getRegions()),
             'label' => 'Canton',
             'mapped' => false,
         ]);

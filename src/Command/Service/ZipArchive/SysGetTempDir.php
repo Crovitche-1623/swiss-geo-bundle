@@ -19,6 +19,6 @@ class SysGetTempDir implements \Stringable
      */
     public function __toString(): string
     {
-        return sys_get_temp_dir();
+        return \sys_get_temp_dir();
     }
 }

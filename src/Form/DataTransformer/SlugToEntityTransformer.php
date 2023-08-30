@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Crovitche\SwissGeoBundle\Form\DataTransformer;
 
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\{AbstractQuery, EntityManagerInterface, NonUniqueResultException, QueryBuilder};
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 
@@ -16,17 +13,12 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class SlugToEntityTransformer implements DataTransformerInterface
 {
-    /**
-     * @param  EntityManagerInterface  $entityManager
-     * @param  string  $className
-     * @param  QueryBuilder|null  $queryBuilder
-     */
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly string $className,
         private readonly ?QueryBuilder $queryBuilder = null,
-    )
-    {}
+    ) {
+    }
 
     /**
      * {@inheritDoc}
@@ -39,7 +31,7 @@ class SlugToEntityTransformer implements DataTransformerInterface
             return null;
         }
 
-        return method_exists($this->className, 'getSlug') ?
+        return \method_exists($this->className, 'getSlug') ?
                      $value->getSlug() :
             (string) $value->getId();
     }
@@ -59,7 +51,7 @@ class SlugToEntityTransformer implements DataTransformerInterface
             return null;
         }
 
-        $identifierColumn = !method_exists($this->className, 'getSlug') ? 'id' : 'slug';
+        $identifierColumn = !\method_exists($this->className, 'getSlug') ? 'id' : 'slug';
 
         if (!$this->queryBuilder) {
             $entity = $this->entityManager->getRepository($this->className)
@@ -67,7 +59,7 @@ class SlugToEntityTransformer implements DataTransformerInterface
         } else {
             $entity = $this->queryBuilder
                 ->andWhere(
-                    sprintf("%s.%s = :identifier",
+                    \sprintf('%s.%s = :identifier',
                         $this->queryBuilder->getRootAliases()[0],
                         $identifierColumn
                     )
@@ -81,10 +73,7 @@ class SlugToEntityTransformer implements DataTransformerInterface
             // causes a validation error
             // this message is not shown to the user
             // see the invalid_message option
-            throw new TransformationFailedException(sprintf(
-                'A(n) %s with %s "%s" does not exist!',
-                $this->className, $identifierColumn, $value
-            ));
+            throw new TransformationFailedException(\sprintf('A(n) %s with %s "%s" does not exist!', $this->className, $identifierColumn, $value));
         }
 
         return $entity;

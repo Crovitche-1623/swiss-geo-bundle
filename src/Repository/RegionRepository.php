@@ -18,10 +18,9 @@ class RegionRepository
         $regions = self::getRegions();
 
         if ($regionAbbreviation) {
-            $regions = array_filter(
+            $regions = \array_filter(
                 $regions,
-                static fn (string $key): bool =>
-                    str_contains($key, $regionAbbreviation)
+                static fn (string $key): bool => \str_contains($key, $regionAbbreviation)
             );
         }
 
@@ -29,7 +28,7 @@ class RegionRepository
             return $regions;
         }
 
-        return array_slice(
+        return \array_slice(
             array: $regions,
             offset: 0,
             length: $numberOfRegions,
@@ -64,11 +63,11 @@ class RegionRepository
             'SO' => 'Soleure',
             'TI' => 'Tessin',
             'TG' => 'Thurgovie',
-            'UR' => 'Uri' ,
+            'UR' => 'Uri',
             'VD' => 'Vaud',
             'VS' => 'Valais',
             'ZG' => 'Zoug',
-            'ZH' => 'Zurich'
+            'ZH' => 'Zurich',
         ];
     }
 }

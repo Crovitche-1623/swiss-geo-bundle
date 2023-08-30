@@ -4,22 +4,17 @@ declare(strict_types=1);
 
 namespace Crovitche\SwissGeoBundle\Command\Import;
 
-use Crovitche\SwissGeoBundle\Command\Service\Cache\GetTimestampFromCacheOrFolderService;
-use Crovitche\SwissGeoBundle\Command\Service\Cache\WriteCacheWithTimestampService;
+use Crovitche\SwissGeoBundle\Command\Service\Cache\{GetTimestampFromCacheOrFolderService, WriteCacheWithTimestampService};
 use Crovitche\SwissGeoBundle\Command\Service\ExtractZipFromServerService;
 use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Extractor;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
-use League\Csv\Reader;
-use League\Csv\Writer;
+use Doctrine\DBAL\{Connection, Exception};
+use League\Csv\{Reader, Writer};
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
+use Symfony\Component\Console\Command\{Command, LockableTrait};
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\OutputStyle;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Style\{OutputStyle, SymfonyStyle};
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 #[AsCommand(
@@ -67,9 +62,8 @@ class ImportStreetsCommand extends Command
                 if ($this->insertDataFromCsvFile()) {
                     ($this->writeCacheWithTimestamp)(self::STREETS_CACHE_NAME, $timestamp);
                 }
-
             },
-            "/var/lib/mysql-files"
+            '/var/lib/mysql-files'
         );
 
         return Command::SUCCESS;
@@ -78,18 +72,18 @@ class ImportStreetsCommand extends Command
     private function createCsvForBulkInsert(string $folder): void
     {
         $csvReader =
-            Reader::createFromPath($folder . '/pure_str.csv')
+            Reader::createFromPath($folder.'/pure_str.csv')
             ->setDelimiter(';')
             ->setHeaderOffset(0)
         ;
 
         $records = $csvReader->getRecords();
-        $recordsCount = count($csvReader);
+        $recordsCount = \count($csvReader);
 
         $streetLocalityWriter = Writer::createFromPath(
-                path: '/var/lib/mysql-files/streets_localities.csv',
-                open_mode: 'w'
-            )
+            path: '/var/lib/mysql-files/streets_localities.csv',
+            open_mode: 'w'
+        )
             ->setDelimiter(',')
         ;
         $streetLocalityWriter->insertOne(['id_street', 'id_locality']);
@@ -99,25 +93,25 @@ class ImportStreetsCommand extends Command
 
         $this->connection->getConfiguration()->setMiddlewares([]);
 
-        $sqlStatement = $this->connection->prepare("
+        $sqlStatement = $this->connection->prepare('
             SELECT
                 l0.id
             FROM
                 Locality l0
             WHERE
                 :ZIP_LABEL = l0.postal_code_and_label
-        ");
+        ');
 
         foreach ($records as $record) {
-            foreach (explode(', ', $record['ZIP_LABEL']) as $locality) {
+            foreach (\explode(', ', $record['ZIP_LABEL']) as $locality) {
                 $localityId = $sqlStatement
                     ->executeQuery(['ZIP_LABEL' => $locality])
                     ->fetchOne();
 
                 if (!$localityId) {
-                    $error = "The locality id cannot be found for label " .
+                    $error = 'The locality id cannot be found for label '.
                         "`$locality`... Did you run the ".
-                        "`swiss-geo-bundle:import:localities` command before ?";
+                        '`swiss-geo-bundle:import:localities` command before ?';
 
                     $this->io->error($error);
 
@@ -126,7 +120,7 @@ class ImportStreetsCommand extends Command
 
                 $streetLocalityWriter->insertOne([
                     $record['STR_ESID'],
-                    $localityId
+                    $localityId,
                 ]);
             }
             $progressBar->advance();
@@ -144,7 +138,7 @@ class ImportStreetsCommand extends Command
         $this->io->info('Inserting the data...');
 
         try {
-            $this->connection->executeQuery(/** @lang  MySQL */"
+            $this->connection->executeQuery(/* @lang  MySQL */ '
                 CREATE TEMPORARY TABLE t___tmp___Street_to_be_inserted (
                     esid INT(11) PRIMARY KEY NOT NULL,
                     label VARCHAR(150) NOT NULL,
@@ -153,9 +147,9 @@ class ImportStreetsCommand extends Command
                     is_official TINYINT(1) NOT NULL,
                     last_modification_date DATE DEFAULT NULL
                 ) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB;
-            ");
+            ');
 
-            $this->connection->executeQuery(/** @lang  MySQL */"
+            $this->connection->executeQuery(/* @lang  MySQL */ "
                 LOAD DATA LOCAL INFILE '/var/lib/mysql-files/pure_str.csv'
                 INTO TABLE t___tmp___Street_to_be_inserted
                 CHARACTER SET utf8
@@ -175,16 +169,16 @@ class ImportStreetsCommand extends Command
              ");
 
             // Supprime les données qui n'existent pas dans la table d'insert
-            $this->connection->executeQuery(/** @lang  MySQL */"
+            $this->connection->executeQuery(/* @lang  MySQL */ '
                 DELETE s0 FROM Street s0
                     LEFT JOIN t___tmp___Street_to_be_inserted s1 ON s0.esid = s1.esid
                 WHERE
                     s1.esid IS NULL;
-            ");
+            ');
 
             // Insert les données à partir de la table d'insert si elles n'existent pas dans la table principale.
             // Les données sont remplacés si la date de modification (STR_MODIFIED) est plus récente
-            $this->connection->executeQuery(/** @lang  MySQL */"
+            $this->connection->executeQuery(/* @lang  MySQL */ '
                 INSERT INTO Street (esid, label, type, completion_status, is_official, last_modification_date)
                 SELECT
                     p0.esid,
@@ -198,17 +192,17 @@ class ImportStreetsCommand extends Command
                     LEFT JOIN Street p1 ON p0.esid = p1.esid
                 WHERE
                     p1.esid IS NULL OR p0.last_modification_date > p1.last_modification_date
-                ON DUPLICATE KEY UPDATE 
+                ON DUPLICATE KEY UPDATE
                     label = VALUES(label),
                     type = VALUES(type),
                     completion_status = VALUES(completion_status),
                     is_official = VALUES(is_official),
                     last_modification_date = VALUES(last_modification_date);
-            ");
+            ');
 
-            $this->connection->executeQuery("
+            $this->connection->executeQuery('
                 DROP TEMPORARY TABLE IF EXISTS t___tmp___Street_to_be_inserted;
-            ");
+            ');
 
             /*
             $this->connection->executeQuery("
@@ -265,7 +259,7 @@ class ImportStreetsCommand extends Command
             ");
             */
 
-            $this->connection->executeQuery(/** @lang  MySQL */"
+            $this->connection->executeQuery(/* @lang  MySQL */ "
                  LOAD DATA LOCAL INFILE '/var/lib/mysql-files/streets_localities.csv'
                  IGNORE INTO TABLE Street__Locality
                  CHARACTER SET utf8
@@ -275,9 +269,8 @@ class ImportStreetsCommand extends Command
                  IGNORE 1 LINES
                  (id_street, id_locality);
              ");
-
         } catch (Exception $e) {
-            $this->io->error('An error occurred when inserting the data...' . $e->getMessage());
+            $this->io->error('An error occurred when inserting the data...'.$e->getMessage());
 
             return false;
         }

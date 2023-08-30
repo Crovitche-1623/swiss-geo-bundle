@@ -41,7 +41,7 @@ class LocalityRepository extends ServiceEntityRepository
         // SQL Query must be used instead of DQL because we have a generated
         // column. FIXME:
         $resultStatement = $connection->executeQuery(
-             sql: "
+            sql: '
                 SELECT
                    l0.id,
                    l0.postal_code,
@@ -49,14 +49,14 @@ class LocalityRepository extends ServiceEntityRepository
                    l0.postal_code_and_label,
                    l0.additional_digits,
                    l0.region_abbreviation
-                FROM 
+                FROM
                    Locality l0
                 WHERE
                    (
                        l0.region_abbreviation IS NULL OR
                        l0.region_abbreviation = :region_abbreviation
                    )
-                   AND 
+                   AND
                    (
                        :postal_code_and_label IS NULL OR
                         l0.postal_code_and_label LIKE :postal_code_and_label
@@ -64,10 +64,10 @@ class LocalityRepository extends ServiceEntityRepository
                 ORDER BY
                    l0.postal_code_and_label
                 LIMIT 7;
-            ",
+            ',
             params: [
                 'region_abbreviation' => $regionAbbreviation,
-                'postal_code_and_label' => '%' . $postalCodeAndLabel . '%'
+                'postal_code_and_label' => '%'.$postalCodeAndLabel.'%',
             ]
         );
 

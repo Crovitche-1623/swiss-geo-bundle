@@ -9,11 +9,11 @@ namespace Crovitche\SwissGeoBundle\Enum\Address;
  */
 enum BuildingCategory: string
 {
-  case Temporary = "temporary";
-  case Residential = "residential";
-  case OtherResidential = "other_residential";
-  case PartlyResidential = "partly_residential";
-  case NonResidential = "non_residential";
-  case Special = "special";
-  case Uncategorized = 'uncategorized';
+    case Temporary = 'temporary';
+    case Residential = 'residential';
+    case OtherResidential = 'other_residential';
+    case PartlyResidential = 'partly_residential';
+    case NonResidential = 'non_residential';
+    case Special = 'special';
+    case Uncategorized = 'uncategorized';
 }

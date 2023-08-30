@@ -8,9 +8,7 @@ use Crovitche\SwissGeoBundle\Entity\Locality;
 use Crovitche\SwissGeoBundle\Repository\LocalityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\{JsonResponse, Request, RequestStack};
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/localities', name: 'swissgeo_api_localities_')]
@@ -19,21 +17,21 @@ class LocalityApiController extends AbstractController
     public function __construct(
         private readonly LocalityRepository $repository,
         private readonly RequestStack $requestStack
-    )
-    {}
+    ) {
+    }
 
     #[Route('/', name: 'index', methods: ['GET'])]
     public function index(): JsonResponse
     {
-        /** @var  Request  $request */
+        /** @var Request $request */
         $request = $this->requestStack->getCurrentRequest();
 
         $regionAbbreviation = $request->query->get('region_abbreviation');
         $postalCodeAndLabel = $request->query->get('postal_code_and_label');
 
         if ($regionAbbreviation &&
-            !preg_match('/^[A-Z]{2}$/', $regionAbbreviation)) {
-            throw new BadRequestException("Wrong region abbreviation format");
+            !\preg_match('/^[A-Z]{2}$/', $regionAbbreviation)) {
+            throw new BadRequestException('Wrong region abbreviation format');
         }
 
         $localities = $this->repository->findAllBySearchCriteria(
@@ -42,7 +40,7 @@ class LocalityApiController extends AbstractController
         );
 
         $formattedResponse = [];
-        /** @var  Locality  $locality */
+        /** @var Locality $locality */
         foreach ($localities as $locality) {
             $itemData['id'] = $locality->getId();
             $itemData['text'] = $locality->postalCodeAndLabel;

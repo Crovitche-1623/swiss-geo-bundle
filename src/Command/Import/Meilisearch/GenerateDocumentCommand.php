@@ -87,15 +87,15 @@ class GenerateDocumentCommand extends Command
         $client = new Client('http://meilisearch:7700');
 
         $client->createIndex('addresses', [
-            'primaryKey' => 'egaid'
+            'primaryKey' => 'egaid',
         ]);
 
         $client->index('addresses')->updateDisplayedAttributes([
-            'egaid', 'title', 'northing', 'easting', 'tilemap_image'
+            'egaid', 'title', 'northing', 'easting', 'tilemap_image',
         ]);
 
         $client->index('addresses')->updateSearchableAttributes([
-            'title'
+            'title',
         ]);
 
         $client->index('addresses')->updateSortableAttributes([
@@ -104,7 +104,7 @@ class GenerateDocumentCommand extends Command
             'postal_code_and_label',
             'street_label',
             'address_number_length',
-            'address_number'
+            'address_number',
         ]);
 
         $client->index('addresses')->updateRankingRules([
@@ -113,7 +113,7 @@ class GenerateDocumentCommand extends Command
             'typo',
             'proximity',
             'attribute',
-            'exactness'
+            'exactness',
         ]);
 
         foreach ($addresses->iterateAssociative() as $address) {
@@ -125,7 +125,7 @@ class GenerateDocumentCommand extends Command
                 $memory = [];
             }
 
-            $i++;
+            ++$i;
 
             $progressBar->advance();
         }

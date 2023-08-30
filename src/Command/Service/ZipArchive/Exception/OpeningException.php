@@ -15,7 +15,7 @@ class OpeningException extends \RuntimeException
     public function __construct(readonly string $zipArchive)
     {
         parent::__construct(
-            "The zip archive $zipArchive cannot be opened... Maybe a permission 
+            "The zip archive $zipArchive cannot be opened... Maybe a permission
             issue ?"
         );
     }

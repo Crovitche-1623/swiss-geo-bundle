@@ -9,7 +9,6 @@ use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use ZipArchive;
 
 class ExtractZipFromServerService
 {
@@ -17,9 +16,8 @@ class ExtractZipFromServerService
 
     public function __construct(
         private readonly HttpClientInterface $httpClient
-    )
-    {
-        $this->zipDirectory = sys_get_temp_dir() . '/';
+    ) {
+        $this->zipDirectory = \sys_get_temp_dir().'/';
     }
 
     /**
@@ -32,8 +30,7 @@ class ExtractZipFromServerService
         OutputStyle $io,
         string $url,
         string $fileName
-    ): bool
-    {
+    ): bool {
         if (!$this->copyZipFromServer($io, $url, $fileName)) {
             return false;
         }
@@ -47,21 +44,19 @@ class ExtractZipFromServerService
         OutputStyle $io,
         string $url,
         string $fileName
-    ): bool
-    {
-
-        $io->info(sprintf('Sending a request to %s...', $url . $fileName));
+    ): bool {
+        $io->info(\sprintf('Sending a request to %s...', $url.$fileName));
 
         try {
             $response = $this->httpClient->request(
                 method: 'GET',
-                url: $url . $fileName
+                url: $url.$fileName
             );
 
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface) {
             $io->error(
-                'A network error occurred or an unsupported configuration has 
+                'A network error occurred or an unsupported configuration has
                 been passed to the HTTP client'
             );
 
@@ -70,23 +65,23 @@ class ExtractZipFromServerService
 
         if (Response::HTTP_OK !== $statusCode) {
             $io->error(
-                'The server responded with a different status code than 
+                'The server responded with a different status code than
                 200'
             );
 
             return false;
         }
 
-        ////////////////////////////////////////////////////////////////////////
+        // //////////////////////////////////////////////////////////////////////
         $io->info(
-            message: sprintf(
+            message: \sprintf(
                 'Trying to copy the received zip archive %s to %s...',
                 $fileName, $this->zipDirectory
             )
         );
-        ////////////////////////////////////////////////////////////////////////
+        // //////////////////////////////////////////////////////////////////////
 
-        if (false === $fileHandler = fopen($this->zipDirectory . $fileName, 'wb')) {
+        if (false === $fileHandler = \fopen($this->zipDirectory.$fileName, 'w')) {
             $io->error('Unable to create the zip file...');
 
             return false;
@@ -99,17 +94,17 @@ class ExtractZipFromServerService
                 $chunkContent = $chunk->getContent();
             } catch (TransportExceptionInterface) {
                 $io->error(
-                    'A network error occurred or the idle timeout has 
+                    'A network error occurred or the idle timeout has
                     been reached'
                 );
 
                 return false;
             }
 
-            fwrite($fileHandler, $chunkContent);
+            \fwrite($fileHandler, $chunkContent);
         }
 
-        $io->success(sprintf('Zip archive %s has been copied...', $fileName));
+        $io->success(\sprintf('Zip archive %s has been copied...', $fileName));
 
         return true;
     }
@@ -117,27 +112,26 @@ class ExtractZipFromServerService
     private function extractZipAndDeleteIt(
         OutputStyle $io,
         string $file
-    ): bool
-    {
-        ////////////////////////////////////////////////////////////////////////
-        $io->info(sprintf('Trying to open the Zip archive %s...', $file));
-        ////////////////////////////////////////////////////////////////////////
+    ): bool {
+        // //////////////////////////////////////////////////////////////////////
+        $io->info(\sprintf('Trying to open the Zip archive %s...', $file));
+        // //////////////////////////////////////////////////////////////////////
 
-        $zipArchive = new ZipArchive();
-        if (true !== $zipArchive->open($this->zipDirectory . $file)) {
+        $zipArchive = new \ZipArchive();
+        if (true !== $zipArchive->open($this->zipDirectory.$file)) {
             $io->error(
-                sprintf('The zip file %s cannot be opened... Maybe a permission 
+                \sprintf('The zip file %s cannot be opened... Maybe a permission
                 issue ?', $file)
             );
 
             return false;
         }
 
-        ////////////////////////////////////////////////////////////////////////
+        // //////////////////////////////////////////////////////////////////////
         $io->info('Trying to extract the content...');
-        ////////////////////////////////////////////////////////////////////////
+        // //////////////////////////////////////////////////////////////////////
 
-        $location = $this->zipDirectory . pathinfo($file, PATHINFO_FILENAME) . '/';
+        $location = $this->zipDirectory.\pathinfo($file, \PATHINFO_FILENAME).'/';
 
         if ($zipArchive->extractTo($location) &&
             $zipArchive->close()) {
@@ -148,11 +142,11 @@ class ExtractZipFromServerService
             return false;
         }
 
-        ////////////////////////////////////////////////////////////////////////
+        // //////////////////////////////////////////////////////////////////////
         $io->info('Trying to delete the zip archive...');
-        ////////////////////////////////////////////////////////////////////////
+        // //////////////////////////////////////////////////////////////////////
 
-        if (unlink($this->zipDirectory . $file)) {
+        if (\unlink($this->zipDirectory.$file)) {
             $io->success('The zip archive has been deleted');
         } else {
             $io->error('Unable to delete the Zip Archive previously downloaded...');

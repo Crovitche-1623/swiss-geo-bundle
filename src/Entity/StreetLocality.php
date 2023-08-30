@@ -14,20 +14,20 @@ use Doctrine\ORM\Mapping as ORM;
  * table.
  */
 #[ORM\Entity(StreetLocalityRepository::class, true)]
-#[ORM\Index(["id_street"], name: "IX___Street__Locality___street")]
-#[ORM\Index(["id_locality"], name: "IX___Street__Locality___locality")]
-#[ORM\Table("Street__Locality")]
-#[ORM\UniqueConstraint("UQ___Street__Locality___street__locality", [
-    "id_street", "id_locality"
+#[ORM\Index(['id_street'], name: 'IX___Street__Locality___street')]
+#[ORM\Index(['id_locality'], name: 'IX___Street__Locality___locality')]
+#[ORM\Table('Street__Locality')]
+#[ORM\UniqueConstraint('UQ___Street__Locality___street__locality', [
+    'id_street', 'id_locality',
 ])]
 class StreetLocality extends AbstractEntity
 {
-    #[ORM\ManyToOne(Street::class, inversedBy: "streetLocality")]
-    #[ORM\JoinColumn("id_street", "esid", false, false, "CASCADE")]
+    #[ORM\ManyToOne(Street::class, inversedBy: 'streetLocality')]
+    #[ORM\JoinColumn('id_street', 'esid', false, false, 'CASCADE')]
     private ?Street $street = null;
 
-    #[ORM\ManyToOne(Locality::class, fetch: "EAGER")]
-    #[ORM\JoinColumn(name: "id_locality", nullable: false)]
+    #[ORM\ManyToOne(Locality::class, fetch: 'EAGER')]
+    #[ORM\JoinColumn(name: 'id_locality', nullable: false)]
     private ?Locality $locality = null;
 
     public function getStreet(): ?Street

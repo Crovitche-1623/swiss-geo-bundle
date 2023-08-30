@@ -11,26 +11,26 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @author  Thibault Gattolliat
  */
-#[ORM\Entity(LocalityRepository::class, true), ORM\Table("Locality")]
-#[ORM\UniqueConstraint("UQ___Locality___label__postal_code",
-    ["postal_code_and_label"]
+#[ORM\Entity(LocalityRepository::class, true), ORM\Table('Locality')]
+#[ORM\UniqueConstraint('UQ___Locality___label__postal_code',
+    ['postal_code_and_label']
 )]
-#[ORM\Index(["postal_code_and_label"],
-    name: "IX___Locality___postal_code_and_label"
+#[ORM\Index(['postal_code_and_label'],
+    name: 'IX___Locality___postal_code_and_label'
 )]
 class Locality extends AbstractEntity
 {
     #[ORM\Column(length: 100)]
     public ?string $label = null;
 
-    #[ORM\Column(length: 4, options: ["fixed" => true])]
+    #[ORM\Column(length: 4, options: ['fixed' => true])]
     public ?string $postalCode = null;
 
-    #[ORM\Column(length: 2, options: ["fixed" => true])]
+    #[ORM\Column(length: 2, options: ['fixed' => true])]
     public ?string $regionAbbreviation = null;
 
     #[ORM\Column(type: Types::SMALLINT, length: 2, options: [
-        "unsigned" => true
+        'unsigned' => true,
     ])]
     public ?int $additionalDigits = null;
 
@@ -43,7 +43,7 @@ class Locality extends AbstractEntity
      */
     #[ORM\Column(length: 110, insertable: false, updatable: false,
         columnDefinition: "VARCHAR(110) GENERATED ALWAYS AS (CONCAT(CONCAT(postal_code, ' '), label)) STORED",
-        generated: "ALWAYS"
+        generated: 'ALWAYS'
     )]
     public ?string $postalCodeAndLabel = null;
 
@@ -58,14 +58,14 @@ class Locality extends AbstractEntity
     public function getUniqueValue(): string
     {
         return
-            $this->postalCodeAndLabel .
-            '_' .
+            $this->postalCodeAndLabel.
+            '_'.
             $this->regionAbbreviation
-            ;
+        ;
     }
 
     public function getSixDigitsPostalCode(): ?string
     {
-        return $this->postalCode . $this->additionalDigits;
+        return $this->postalCode.$this->additionalDigits;
     }
 }

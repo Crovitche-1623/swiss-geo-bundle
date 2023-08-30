@@ -6,16 +6,13 @@ namespace Crovitche\SwissGeoBundle\Command\Import;
 
 use Crovitche\SwissGeoBundle\Command\Service\ExtractZipFromServerService;
 use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Extractor;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception as DBALException;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
+use Doctrine\DBAL\{Connection, Exception as DBALException};
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\{Command, LockableTrait};
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\OutputStyle;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Style\{OutputStyle, SymfonyStyle};
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 #[AsCommand(
@@ -71,7 +68,7 @@ class ImportLocalitiesCommand extends Command
         $this->io->info('Inserting the data...');
 
         try {
-            $this->connection->executeQuery(/** @lang MySQL */"
+            $this->connection->executeQuery(/* @lang MySQL */ "
                 LOAD DATA LOCAL INFILE '/var/lib/mysql-files/PLZO_CSV_LV95.csv'
                 INTO TABLE Locality
                 CHARACTER SET utf8
@@ -88,7 +85,7 @@ class ImportLocalitiesCommand extends Command
                 ;
             ");
         } catch (DBALException $e) {
-            $this->io->error('An error occurred when inserting the data...'. $e->getMessage());
+            $this->io->error('An error occurred when inserting the data...'.$e->getMessage());
 
             return false;
         }

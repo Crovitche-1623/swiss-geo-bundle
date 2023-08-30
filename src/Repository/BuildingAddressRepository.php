@@ -8,10 +8,7 @@ use Crovitche\SwissGeoBundle\Entity\BuildingAddress;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\{ArrayCollection, Collection};
 use Doctrine\DBAL\ParameterType;
-use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\NonUniqueResultException;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\{AbstractQuery, NonUniqueResultException, Query, QueryBuilder};
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -39,11 +36,11 @@ class BuildingAddressRepository extends ServiceEntityRepository
     public function findAllByStreetLocality(
         int $streetLocalityId,
         ?string $number = null
-    ): Collection
-    {
+    ): Collection {
         $qb = $this->getFindAllByStreetLocalityQueryBuilder($streetLocalityId, $number, isSearchQuery: true);
         $query = $qb->getQuery();
         $query->setHint(Query::HINT_READ_ONLY, true);
+
         return new ArrayCollection($query->getResult());
     }
 
@@ -51,8 +48,7 @@ class BuildingAddressRepository extends ServiceEntityRepository
         int $streetLocalityId,
         ?string $addressNumber = null,
         bool $isSearchQuery = false
-    ): QueryBuilder
-    {
+    ): QueryBuilder {
         $qb = $this->_em->createQueryBuilder();
         $qb
             ->select('a0')
@@ -63,20 +59,20 @@ class BuildingAddressRepository extends ServiceEntityRepository
             ->andWhere("s2.type = 'street'")
             ->andWhere("s2.status <> 'outdated'")
             ->andWhere('s1.id = :street_locality_id')
-            ->setParameter("street_locality_id", $streetLocalityId)
+            ->setParameter('street_locality_id', $streetLocalityId)
         ;
 
         if ($isSearchQuery) {
             $qb
                 ->andWhere(
                     $qb->expr()->orX(
-                        $qb->expr()->isNull(":address_number"),
-                        $qb->expr()->like("a0.number", ":address_number")
+                        $qb->expr()->isNull(':address_number'),
+                        $qb->expr()->like('a0.number', ':address_number')
                     )
                 )
-                ->setParameter("address_number", "%" . $addressNumber . '%')
-                ->addOrderBy("LENGTH(a0.number)")
-                ->addOrderBy("a0.number")
+                ->setParameter('address_number', '%'.$addressNumber.'%')
+                ->addOrderBy('LENGTH(a0.number)')
+                ->addOrderBy('a0.number')
                 ->setMaxResults(self::API_ADDRESSES_PER_PAGE)
             ;
         }
@@ -114,6 +110,7 @@ class BuildingAddressRepository extends ServiceEntityRepository
         $query = $qb->getQuery();
         $query->setHint(Query::HINT_READ_ONLY, true);
         $query->setHydrationMode(AbstractQuery::HYDRATE_OBJECT);
+
         return $query->getOneOrNullResult();
     }
 }

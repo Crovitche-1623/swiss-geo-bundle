@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace Crovitche\SwissGeoBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Embeddable;
+use Doctrine\ORM\Mapping\{Column, Embeddable};
 
 /**
  * @author  Thibault Gattolliat
@@ -17,7 +16,7 @@ use Doctrine\ORM\Mapping\Embeddable;
 class LV95Coordinates
 {
     /**
-     * @var  null|int<0,  16777215>
+     * @var  int<0,  16777215>|null
      */
     #[Column(
         name: 'lv95_northing',
@@ -30,7 +29,7 @@ class LV95Coordinates
     private ?int $northing = null;
 
     /**
-     * @var  null|int<0,  16777215>
+     * @var  int<0,  16777215>|null
      */
     #[Column(
         name: 'lv95_easting',
@@ -61,8 +60,8 @@ class LV95Coordinates
         $longitude = 2.6779094
              + 4.728982 * $yAux
              + 0.791484 * $yAux * $xAux
-             + 0.1306   * $yAux * ($xAux ** 2)
-             - 0.0436   * ($yAux ** 3);
+             + 0.1306 * $yAux * ($xAux ** 2)
+             - 0.0436 * ($yAux ** 3);
 
         // Unit 10000" to 1 " and converts seconds to degrees (dec)
         return $longitude * 100 / 36;
@@ -85,18 +84,18 @@ class LV95Coordinates
         $xAux = ($this->getX() - 200000) / 1000000;
 
         $latitude = 16.9023892
-            +  3.238272 * $xAux
-            -  0.270978 * ($yAux ** 2)
-            -  0.002528 * ($xAux ** 2)
-            -  0.0447   * ($yAux ** 2) * $xAux
-            -  0.0140   * ($xAux ** 3);
+            + 3.238272 * $xAux
+            - 0.270978 * ($yAux ** 2)
+            - 0.002528 * ($xAux ** 2)
+            - 0.0447 * ($yAux ** 2) * $xAux
+            - 0.0140 * ($xAux ** 3);
 
         // Unit 10000" to 1 " and converts seconds to degrees (dec)
         return $latitude * 100 / 36;
     }
 
     /**
-     * @return  null|int<0,  16777215>
+     * @return  int<0,  16777215>|null
      */
     public function getNorthing(): ?int
     {
@@ -104,7 +103,7 @@ class LV95Coordinates
     }
 
     /**
-     * @param  null|int<0,  16777215>  $northing
+     * @param  int<0,  16777215>|null  $northing
      *
      * @return  static
      */
@@ -116,7 +115,7 @@ class LV95Coordinates
     }
 
     /**
-     * @return  null|int<0,  16777215>
+     * @return  int<0,  16777215>|null
      */
     public function getX(): ?int
     {
@@ -124,7 +123,7 @@ class LV95Coordinates
     }
 
     /**
-     * @param  null|int<0, 16777215>  $x
+     * @param  int<0, 16777215>|null  $x
      *
      * @return  static
      */
@@ -136,7 +135,7 @@ class LV95Coordinates
     }
 
     /**
-     * @return  null|int<0,  16777215>
+     * @return  int<0,  16777215>|null
      */
     public function getEasting(): ?int
     {
@@ -144,7 +143,7 @@ class LV95Coordinates
     }
 
     /**
-     * @param  null|int<0,  16777215>  $easting
+     * @param  int<0,  16777215>|null  $easting
      *
      * @return  static
      */
@@ -156,7 +155,7 @@ class LV95Coordinates
     }
 
     /**
-     * @return  null|int<0,  16777215>
+     * @return  int<0,  16777215>|null
      */
     public function getY(): ?int
     {
@@ -164,7 +163,7 @@ class LV95Coordinates
     }
 
     /**
-     * @param  null|int<0, 16777215>  $y
+     * @param  int<0, 16777215>|null  $y
      *
      * @return  static
      */

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace Crovitche\SwissGeoBundle\Repository;
 
-use Crovitche\SwissGeoBundle\Entity\BuildingAddress;
-use Crovitche\SwissGeoBundle\Entity\Street;
+use Crovitche\SwissGeoBundle\Entity\{BuildingAddress, Street};
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Collections\{ArrayCollection, Collection};
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Query;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\{Query, QueryBuilder};
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -52,11 +50,11 @@ class StreetRepository extends ServiceEntityRepository
     public function findAllByLocality(
         int $localityId,
         ?string $name = null
-    ): Collection
-    {
+    ): Collection {
         $qb = $this->getFindAllByLocalityQueryBuilder($localityId, $name, isSearchQuery: true);
         $query = $qb->getQuery();
         $query->setHint(Query::HINT_READ_ONLY, true);
+
         return new ArrayCollection($query->getResult());
     }
 
@@ -64,8 +62,7 @@ class StreetRepository extends ServiceEntityRepository
         int $localityId,
         ?string $streetName = null,
         bool $isSearchQuery = false
-    ): QueryBuilder
-    {
+    ): QueryBuilder {
         $qb = $this->_em->createQueryBuilder();
         $qb
             ->select('s0')
@@ -74,7 +71,7 @@ class StreetRepository extends ServiceEntityRepository
             ->innerJoin('s1.locality', 'l1')
             ->andWhere("s0.type = 'street'")
             ->andWhere("s0.status <> 'outdated'")
-            ->andWhere("l1.id = :locality_id")
+            ->andWhere('l1.id = :locality_id')
             ->setParameter('locality_id', $localityId, Types::INTEGER);
 
         $this->whereAssociatedAddressesHavingNumbers($qb);
@@ -87,11 +84,12 @@ class StreetRepository extends ServiceEntityRepository
                         $qb->expr()->like('s0.name', ':street_name')
                     )
                 )
-                ->setParameter('street_name', '%' . $streetName . '%', Types::STRING)
-                ->orderBy("s0.name")
+                ->setParameter('street_name', '%'.$streetName.'%', Types::STRING)
+                ->orderBy('s0.name')
                 ->setMaxResults(self::LIMIT)
             ;
         }
+
         return $qb;
     }
 }

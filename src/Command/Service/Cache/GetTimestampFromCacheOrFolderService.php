@@ -10,8 +10,7 @@ use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\Console\Style\OutputStyle;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Finder\Finder;
-use Symfony\Contracts\Cache\CacheInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\{CacheInterface, ItemInterface};
 
 /**
  * Responsible for throwing an exception if the timestamp in file is not newer
@@ -26,8 +25,8 @@ class GetTimestampFromCacheOrFolderService
 
     public function __construct(
         private readonly CacheInterface $cache
-    )
-    {}
+    ) {
+    }
 
     /**
      * @throws  InvalidArgumentException
@@ -42,15 +41,12 @@ class GetTimestampFromCacheOrFolderService
         string $filename = self::DEFAULT_TIMESTAMP_FILENAME,
         string $timestampRegex = self::TIMESTAMP_FORMAT_REGEX,
     ): string {
-        $finder = (new Finder)->files()->in((string) $directory)
+        $finder = (new Finder())->files()->in((string) $directory)
             ->name($filename)
             ->contains($timestampRegex);
 
         if (!$finder->hasResults()) {
-            throw new FileNotFoundException(
-                "There is no file called `$filename` containing a timestamp " .
-                "with this format (YYYY-MM-DD) in `$directory` directory."
-            );
+            throw new FileNotFoundException("There is no file called `$filename` containing a timestamp with this format (YYYY-MM-DD) in `$directory` directory.");
         }
 
         $timestampFromFile = null;
@@ -71,7 +67,7 @@ class GetTimestampFromCacheOrFolderService
 
         if ($this->timestampDidNotExistLocally) {
             $io->info(
-                "No locally existing timestamp $cacheKeyName. The received " .
+                "No locally existing timestamp $cacheKeyName. The received ".
                 "($timestampFromFile) will be used..."
             );
 
@@ -84,9 +80,9 @@ class GetTimestampFromCacheOrFolderService
 
         $io->note(
             "There was a local timestamp indicating that the $cacheKeyName had ".
-            "already been imported (timestamp $timestampFromCache). However, " .
-            "the one received is more recent (timestamp $timestampFromFile). " .
-            "The import continues."
+            "already been imported (timestamp $timestampFromCache). However, ".
+            "the one received is more recent (timestamp $timestampFromFile). ".
+            'The import continues.'
         );
 
         return $timestampFromFile;

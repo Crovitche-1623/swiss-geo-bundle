@@ -27,7 +27,7 @@ class BuildingAddressType extends AbstractType
                 'autocomplete' => false,
                 'class' => '',
                 'data-controller' => 'crovitche--swiss-geo-bundle--tom-select',
-                'data-crovitche--swiss-geo-bundle--tom-select-url-value' => 'http://localhost:7701/indexes/addresses/search'
+                'data-crovitche--swiss-geo-bundle--tom-select-url-value' => 'http://localhost:7701/indexes/addresses/search',
             ],
             'autocomplete-url' => 'http://localhost:7701/indexes/addresses/search',
             'payload-name' => 'q',
@@ -41,7 +41,7 @@ class BuildingAddressType extends AbstractType
                     $locality?->postalCodeAndLabel.' ('.
                     $locality?->regionAbbreviation.')'
                 ;
-            }
+            },
         ]);
     }
 

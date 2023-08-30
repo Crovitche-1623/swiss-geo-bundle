@@ -14,14 +14,14 @@ use Doctrine\ORM\Mapping as ORM;
 abstract class AbstractEntity
 {
     /**
-     * @var  null|int<0, 4294967295>
+     * @var  int<0, 4294967295>|null
      */
     #[ORM\Id, ORM\GeneratedValue]
-    #[ORM\Column(type: Types::INTEGER, options: ["unsigned" => true])]
+    #[ORM\Column(type: Types::INTEGER, options: ['unsigned' => true])]
     protected ?int $id = null;
 
     /**
-     * @return  null|int<0, 4294967295>
+     * @return  int<0, 4294967295>|null
      */
     public function getId(): ?int
     {
@@ -29,7 +29,7 @@ abstract class AbstractEntity
     }
 
     /**
-     * @param  null|int<0, 4294967295>  $id
+     * @param  int<0, 4294967295>|null  $id
      *
      * @return  static
      */

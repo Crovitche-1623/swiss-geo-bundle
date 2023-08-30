@@ -4,40 +4,39 @@ declare(strict_types=1);
 
 namespace Crovitche\SwissGeoBundle\Entity;
 
+use Crovitche\SwissGeoBundle\Enum\Street\Type;
+use Crovitche\SwissGeoBundle\Enum\StreetOrAddressStatus;
 use Crovitche\SwissGeoBundle\Repository\StreetRepository;
 use Doctrine\Common\Collections\{ArrayCollection, Collection};
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\Pure;
-use Crovitche\SwissGeoBundle\Enum\Street\Type;
-use Crovitche\SwissGeoBundle\Enum\StreetOrAddressStatus;
 
 /**
  * @author  Thibault Gattolliat
  *
- *
  * Area and place are also considered as street in Switzerland topography
  * system.
  */
-#[ORM\Entity(StreetRepository::class, true), ORM\Table("Street")]
-#[ORM\Index(["label"], name: "FTIX___Street___label", flags: ["fulltext"])]
+#[ORM\Entity(StreetRepository::class, true), ORM\Table('Street')]
+#[ORM\Index(['label'], name: 'FTIX___Street___label', flags: ['fulltext'])]
 class Street extends AbstractEntity
 {
     // We have to override the default strategy defined in AbstractEntity
     #[ORM\Id, ORM\GeneratedValue('NONE')]
-    #[ORM\Column("esid", Types::INTEGER, options: [
-        "comment" => "Identificateur fédéral de rue",
-        "unsigned" => true
+    #[ORM\Column('esid', Types::INTEGER, options: [
+        'comment' => 'Identificateur fédéral de rue',
+        'unsigned' => true,
     ])]
     protected ?int $id = null;
 
-    #[ORM\Column("label", length: 150)]
+    #[ORM\Column('label', length: 150)]
     private ?string $name = null;
 
     /**
      * @var  Collection<int, StreetLocality>
      */
-    #[ORM\OneToMany("street", StreetLocality::class, orphanRemoval: true)]
+    #[ORM\OneToMany('street', StreetLocality::class, orphanRemoval: true)]
     private Collection $streetLocality;
 
     #[ORM\Column(
@@ -45,13 +44,13 @@ class Street extends AbstractEntity
         nullable: true,
         enumType: Type::class,
         options: [
-            "comment" => "Genre d’objet (rue, place ou autre)"
+            'comment' => 'Genre d’objet (rue, place ou autre)',
         ]
     )]
     private ?Type $type = null;
 
     #[ORM\Column(
-        /**
+        /*
          * `status` is a reserved MySQL word:
          * @see https://dev.mysql.com/doc/refman/8.0/en/keywords.html
          */
@@ -59,7 +58,7 @@ class Street extends AbstractEntity
         length: 8,
         enumType: StreetOrAddressStatus::class,
         options: [
-            "comment" => "État de réalisation de la rue selon le RegBL"
+            'comment' => 'État de réalisation de la rue selon le RegBL',
         ]
     )]
     private ?StreetOrAddressStatus $status = null;
@@ -67,8 +66,7 @@ class Street extends AbstractEntity
     /**
      * Désignation officielle de la rue
      */
-    #[ORM\Column(type: Types::BOOLEAN, options: ["comment" =>
-        "Caractère obligatoire de l’orthographe du nom de la rue selon le RegBL"
+    #[ORM\Column(type: Types::BOOLEAN, options: ['comment' => 'Caractère obligatoire de l’orthographe du nom de la rue selon le RegBL',
     ])]
     private ?bool $isOfficial = null;
 
@@ -76,7 +74,7 @@ class Street extends AbstractEntity
         type: Types::DATE_IMMUTABLE,
         nullable: true,
         options: [
-            "comment" => "Date de la dernière modification de la rue"
+            'comment' => 'Date de la dernière modification de la rue',
         ]
     )]
     private ?\DateTimeImmutable $lastModificationDate = null;
@@ -103,7 +101,6 @@ class Street extends AbstractEntity
 
         return $this;
     }
-
 
     public function getType(): ?Type
     {

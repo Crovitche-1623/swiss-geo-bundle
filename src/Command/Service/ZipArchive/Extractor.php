@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Crovitche\SwissGeoBundle\Command\Service\ZipArchive;
 
-use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Exception\ClosingException;
-use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Exception\CopyingFileException;
-use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Exception\OpeningException;
+use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Exception\{ClosingException, CopyingFileException, OpeningException};
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
@@ -20,8 +18,8 @@ class Extractor
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger
-    )
-    {}
+    ) {
+    }
 
     /**
      * @param  string  $from  The zip archive path. It must be located locally.
@@ -43,8 +41,7 @@ class Extractor
         string $from,
         callable $function,
         string|\Stringable|SysGetTempDir $to = new SysGetTempDir()
-    ): void
-    {
+    ): void {
         if (false === ($zipArchive = new \ZipArchive())->open($from)) {
             throw new OpeningException($from);
         }
@@ -53,20 +50,20 @@ class Extractor
 
         $filesystem = new Filesystem();
 
-        for ($i = 0; $i < $zipArchive->numFiles; $i++) {
+        for ($i = 0; $i < $zipArchive->numFiles; ++$i) {
             $filename = $zipArchive->getNameIndex($i);
 
             $filesystem->mkdir($to);
 
-            $copyTo = sprintf(
+            $copyTo = \sprintf(
                 "$to/%s",
                 // https://en.wikipedia.org/wiki/Basename
-                pathinfo($filename, PATHINFO_BASENAME)
+                \pathinfo($filename, \PATHINFO_BASENAME)
             );
 
             // Maybe submit a PR to include this functionality in
             // `symfony/filesystem` ?
-            if (!copy($copyFrom = "zip://$from#$filename", $copyTo)) {
+            if (!\copy($copyFrom = "zip://$from#$filename", $copyTo)) {
                 throw new CopyingFileException($copyFrom, $copyTo);
             }
 
@@ -84,7 +81,6 @@ class Extractor
         }
     }
 
-
     /**
      * Extract Zip archive from the Web.
      *
@@ -92,24 +88,22 @@ class Extractor
      *                       `https://example.com/backups/archive.zip`
      * @param  callable  $function  see Extractor::extract()
      * @param  string|\Stringable|SysGetTempDir  $to  see Extractor::extract()
-     *
      * @param  string|\Stringable|SysGetTempDir  $downloadTo
      *                                          Where the zip archive will be
      *                                          copied during the process.
      *                                          Do not add a trailing slash !
      *
-     * @throws TransportExceptionInterface
+     * @throws transportExceptionInterface
      *
      * Note: The SysGetTempDir union type is probably unnecessary, but it's here
-     *       to make PhpStorm happy.
+     *       to make PhpStorm happy
      */
     public function extractFromWeb(
         string $url,
         callable $function,
         string|\Stringable|SysGetTempDir $to = new SysGetTempDir(),
         string|\Stringable|SysGetTempDir $downloadTo = new SysGetTempDir()
-    ): void
-    {
+    ): void {
         $response = $this->httpClient->request('GET', $url);
 
         $statusCode = $response->getStatusCode();
@@ -118,12 +112,12 @@ class Extractor
             throw new CopyingFileException($url, $to, $statusCode);
         }
 
-        $from = sprintf(
+        $from = \sprintf(
             "$downloadTo/%s.zip",
-            uniqid(gethostname(), more_entropy: true)
+            \uniqid(\gethostname(), more_entropy: true)
         );
 
-        if (false === $fileHandler = fopen($from, 'wb')) {
+        if (false === $fileHandler = \fopen($from, 'w')) {
             throw new OpeningException($from);
         }
 
@@ -132,14 +126,14 @@ class Extractor
         foreach ($this->httpClient->stream($response) as $chunk) {
             $chunkContent = $chunk->getContent();
 
-            fwrite($fileHandler, $chunkContent);
+            \fwrite($fileHandler, $chunkContent);
         }
 
-        if (!fclose($fileHandler)) {
+        if (!\fclose($fileHandler)) {
             throw new ClosingException($from);
         }
 
-        $this->logger->debug($from. ' has been copied.');
+        $this->logger->debug($from.' has been copied.');
 
         self::extract($from, $function, $to);
     }

@@ -56,7 +56,7 @@ class CrovitcheSwissGeoBundle extends AbstractBundle
         ContainerConfigurator $container,
         ContainerBuilder $builder
     ): void {
-        $loader = new YamlFileLoader($builder, new FileLocator(dirname(__DIR__).'/config'));
+        $loader = new YamlFileLoader($builder, new FileLocator(\dirname(__DIR__).'/config'));
         $loader->load('services.yaml');
 
         $builder->setParameter('crovitche_swiss_geo.meilisearch_url', $config['meilisearch_url']);

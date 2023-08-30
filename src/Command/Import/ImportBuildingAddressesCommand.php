@@ -5,20 +5,16 @@ declare(strict_types=1);
 namespace Crovitche\SwissGeoBundle\Command\Import;
 
 use Crovitche\SwissGeoBundle\Command\Import\Exception\InternalImportingException;
-use Crovitche\SwissGeoBundle\Command\Service\Cache\GetTimestampFromCacheOrFolderService;
-use Crovitche\SwissGeoBundle\Command\Service\Cache\WriteCacheWithTimestampService;
+use Crovitche\SwissGeoBundle\Command\Service\Cache\{GetTimestampFromCacheOrFolderService, WriteCacheWithTimestampService};
 use Crovitche\SwissGeoBundle\Command\Service\ExtractZipFromServerService;
 use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Extractor;
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception;
+use Doctrine\DBAL\{Connection, Exception};
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
+use Symfony\Component\Console\Command\{Command, LockableTrait};
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\OutputStyle;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Style\{OutputStyle, SymfonyStyle};
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 #[AsCommand(
@@ -54,7 +50,7 @@ class ImportBuildingAddressesCommand extends Command
     {
         if (!$this->lock()) {
             $output->writeln(
-                sprintf(
+                \sprintf(
                     'The command %s is already running in another process.',
                     self::COMMAND_NAME
                 )
@@ -72,7 +68,7 @@ class ImportBuildingAddressesCommand extends Command
                 $this->insertDataFromCsvFile();
                 ($this->writeCacheWithTimestamp)(self::ADDRESSES_CACHE_NAME, $timestamp);
             },
-            "/var/lib/mysql-files"
+            '/var/lib/mysql-files'
         );
 
         return Command::SUCCESS;
@@ -89,7 +85,7 @@ class ImportBuildingAddressesCommand extends Command
         try {
             $this->io->info('Creating temporary table...');
 
-            $this->connection->executeQuery(/** @lang  MySQL */ "
+            $this->connection->executeQuery(/* @lang  MySQL */ '
                 CREATE TEMPORARY TABLE IF NOT EXISTS t___tmp___Building_address_to_be_inserted (
                     egaid INT(11) UNSIGNED PRIMARY KEY NOT NULL,
                     id_street INT(10) UNSIGNED NOT NULL,
@@ -104,11 +100,11 @@ class ImportBuildingAddressesCommand extends Command
                     lv95_northing INT(11) DEFAULT NULL,
                     lv95_easting INT(11) DEFAULT NULL,
                     last_modification_date DATE NOT NULL
-                );");
+                );');
             $this->io->success('Done !');
 
             $this->io->info('Loading data from CSV file in it (This may take a while)...');
-            $this->connection->executeQuery(/** @lang  MySQL */ "
+            $this->connection->executeQuery(/* @lang  MySQL */ "
                 LOAD DATA
                     LOCAL
                     INFILE '/var/lib/mysql-files/pure_adr.csv'
@@ -139,7 +135,7 @@ class ImportBuildingAddressesCommand extends Command
 
             $this->io->info('Deleting existing building addresses that do not exist in the temporary table...');
 
-            $this->connection->executeQuery(/** @lang  MySQL */ "
+            $this->connection->executeQuery(/* @lang  MySQL */ "
                 # Supprime les adresses existantes qui n'existent plus dans la table d'insert
                 DELETE a0 FROM Building_address a0
                     LEFT JOIN t___tmp___Building_address_to_be_inserted a1 ON a0.egaid = a1.egaid
@@ -150,7 +146,7 @@ class ImportBuildingAddressesCommand extends Command
             $this->io->success('Done.');
 
             $this->io->info('Adding new or more recent building addresses...');
-            $this->connection->executeQuery(/** @lang  MySQL */ "
+            $this->connection->executeQuery(/* @lang  MySQL */ "
                 # Insert les données à partir de la table d'insert si elles n'existent pas dans la table principale.
                 # Les données sont remplacés si la date de modification (STR_MODIFIED) est plus récente
                 INSERT INTO Building_address (
@@ -160,12 +156,12 @@ class ImportBuildingAddressesCommand extends Command
                     lv95_easting, last_modification_date
                 )
                 SELECT
-                    a0.egaid, 
+                    a0.egaid,
                     (SELECT s2.id FROM Street__Locality s2 INNER JOIN Locality l3 ON s2.id_locality = l3.id WHERE s2.id_street = a0.id_street AND l3.postal_code_and_label = a0.postal_code_and_label),
                     a0.building_id,
                     a0.entrance_number,
                     a0.address_number,
-                    a0.building_name, 
+                    a0.building_name,
                     a0.building_category,
                     a0.completion_status,
                     a0.is_official,
@@ -178,7 +174,7 @@ class ImportBuildingAddressesCommand extends Command
                 WHERE
                     (a1.egaid IS NULL OR a0.last_modification_date > a1.last_modification_date) AND
                     (SELECT s2.id FROM Street__Locality s2 INNER JOIN Locality l3 ON s2.id_locality = l3.id WHERE s2.id_street = a0.id_street AND l3.postal_code_and_label = a0.postal_code_and_label) IS NOT NULL
-                ON DUPLICATE KEY UPDATE 
+                ON DUPLICATE KEY UPDATE
                     id_street_locality = VALUES(id_street_locality),
                     building_id = VALUES(building_id),
                     entrance_number = VALUES(entrance_number),
@@ -194,16 +190,16 @@ class ImportBuildingAddressesCommand extends Command
             $this->io->success('Done !');
 
             $this->io->info('Deletion of the temporary table...');
-            $this->connection->executeQuery(/** @lang  MySQL */ "
+            $this->connection->executeQuery(/* @lang  MySQL */ '
                 DROP TEMPORARY TABLE IF EXISTS t___tmp___Building_address_to_be_inserted;
-            ");
+            ');
             $this->io->success('Done !');
 
             $this->connection->commit();
-        } catch (Exception) {
+        } catch (Exception $e) {
             $this->connection->rollBack();
 
-            throw new InternalImportingException("building addresses");
+            throw new InternalImportingException('building addresses'.$e->getMessage());
         }
 
         $this->io->success('Building addresses has been imported!');
