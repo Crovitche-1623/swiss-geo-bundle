@@ -12,11 +12,14 @@ use JetBrains\PhpStorm\Pure;
 class InternalImportingException extends \RuntimeException
 {
     #[Pure]
-    public function __construct(readonly string $subject)
+    public function __construct(
+        readonly string $subject,
+        ?\Throwable $previous = null
+    )
     {
         parent::__construct(
-            "Cannot import \"$subject\". Contact an administrator to
-            investigate."
+            "Cannot import \"$subject\". Contact an administrator to investigate.",
+            previous: $previous,
         );
     }
 }

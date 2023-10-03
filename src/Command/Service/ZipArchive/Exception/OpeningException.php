@@ -12,11 +12,14 @@ use JetBrains\PhpStorm\Pure;
 class OpeningException extends \RuntimeException
 {
     #[Pure]
-    public function __construct(readonly string $zipArchive)
+    public function __construct(
+        readonly string $zipArchive,
+        ?\Throwable $previous = null,
+    )
     {
         parent::__construct(
-            "The zip archive $zipArchive cannot be opened... Maybe a permission
-            issue ?"
+            "The zip archive \"$zipArchive\" cannot be opened... Maybe a permission issue ?",
+            previous: $previous,
         );
     }
 }

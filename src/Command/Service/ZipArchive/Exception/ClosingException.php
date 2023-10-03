@@ -12,10 +12,14 @@ use JetBrains\PhpStorm\Pure;
 class ClosingException extends \RuntimeException
 {
     #[Pure]
-    public function __construct(readonly string $from)
+    public function __construct(
+        readonly string $from,
+        ?\Throwable $previous = null,
+    )
     {
         parent::__construct(
-            "Cannot close the zip archive \"$from\" normally opened previously"
+            "Cannot close the zip archive \"$from\" normally opened previously",
+            previous: $previous,
         );
     }
 }

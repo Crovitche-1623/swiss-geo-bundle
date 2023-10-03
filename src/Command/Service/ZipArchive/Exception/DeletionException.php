@@ -12,10 +12,14 @@ use JetBrains\PhpStorm\Pure;
 class DeletionException extends \RuntimeException
 {
     #[Pure]
-    public function __construct(readonly string $from)
+    public function __construct(
+        readonly string $from,
+        ?\Throwable $previous = null
+    )
     {
         parent::__construct(
-            "Cannot delete \"$from\". Maybe a permission issue ?"
+            "Cannot delete \"$from\". Maybe a permission issue ?",
+            previous: $previous,
         );
     }
 }

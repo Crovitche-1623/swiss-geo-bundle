@@ -12,10 +12,14 @@ use JetBrains\PhpStorm\Pure;
 class DirectoryException extends \RuntimeException
 {
     #[Pure]
-    public function __construct(readonly string $to)
+    public function __construct(
+        readonly string $to,
+        ?\Throwable $previous = null,
+    )
     {
         parent::__construct(
-            "\"$to\" is not a directory or it could not be created"
+            "\"$to\" is not a directory or it could not be created",
+            previous: $previous,
         );
     }
 }

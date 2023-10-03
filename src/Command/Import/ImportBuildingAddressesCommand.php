@@ -199,7 +199,7 @@ class ImportBuildingAddressesCommand extends Command
         } catch (Exception $e) {
             $this->connection->rollBack();
 
-            throw new InternalImportingException('building addresses'.$e->getMessage());
+            throw new InternalImportingException('building addresses'.$e->getMessage(), $e);
         }
 
         $this->io->success('Building addresses has been imported!');

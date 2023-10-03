@@ -15,7 +15,8 @@ class CopyingFileException extends \RuntimeException
     public function __construct(
         readonly string $from,
         readonly string $to,
-        readonly ?int $httpStatusCode = null
+        readonly ?int $httpStatusCode = null,
+        ?\Throwable $previous = null,
     ) {
         $message = "Cannot copy \"$from\" to \"$to\".".\PHP_EOL;
 
@@ -26,6 +27,6 @@ class CopyingFileException extends \RuntimeException
              manually ?'.\PHP_EOL;
         }
 
-        parent::__construct($message);
+        parent::__construct($message, previous: $previous);
     }
 }
