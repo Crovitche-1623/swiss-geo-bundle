@@ -75,7 +75,7 @@ class Street extends AbstractEntity
     /**
      * Date de la dernière modification de la rue
      */
-    #[ORM\Column(type: Types::DATE_IMMUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private ?\DateTimeImmutable $lastModificationDate = null;
 
     #[Pure]
