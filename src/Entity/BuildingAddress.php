@@ -15,9 +15,8 @@ use Doctrine\ORM\Mapping as ORM;
  */
 #[ORM\Entity(BuildingAddressRepository::class, true), ORM\Table('Building_address')]
 #[ORM\Index(['id_street_locality'], name: 'IX___Building_address___street_locality')]
-class BuildingAddress extends AbstractEntity
+class BuildingAddress
 {
-    // We have to override the default strategy defined in AbstractEntity.
     /**
      * N° d'identification fédérale de l'adresse de bâtiments selon le RegBL
      */
@@ -25,7 +24,7 @@ class BuildingAddress extends AbstractEntity
     #[ORM\Column('egaid', Types::INTEGER, 9, options: [
         'unsigned' => true,
     ])]
-    protected ?int $id = null;
+    private ?int $id = null;
 
     #[ORM\ManyToOne(StreetLocality::class, fetch: 'EAGER')]
     #[ORM\JoinColumn('id_street_locality', 'id', false, false, 'CASCADE')]
@@ -100,6 +99,37 @@ class BuildingAddress extends AbstractEntity
     public function __toString(): string
     {
         return (string) $this->getNumber();
+    }
+
+    /**
+     * @return  int<0, 4294967295>|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param  int<0, 4294967295>|null  $id
+     *
+     * @return  static
+     */
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return  string  An unique value for cache purpose or data fixtures.
+     *                  avoid the id if possible because the id require the
+     *                  entity to be persisted. It can be a combinaison of
+     *                  multiple fields.
+     */
+    public function getUniqueValue(): string
+    {
+        return (string) $this->getId();
     }
 
     public function getStreetLocality(): ?StreetLocality

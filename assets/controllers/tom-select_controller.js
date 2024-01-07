@@ -1,6 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 import TomSelect from "tom-select"
 
+// The following comment enables the lazy loading of the controller:
+// @see https://symfony.com/bundles/StimulusBundle/current/index.html#lazy-stimulus-controllers
+/* stimulusFetch: 'lazy' */
 export default class extends Controller {
   // @see https://stimulus.hotwired.dev/reference/values
   static values = {

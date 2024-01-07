@@ -20,17 +20,16 @@ use JetBrains\PhpStorm\Pure;
  */
 #[ORM\Entity(StreetRepository::class, true), ORM\Table('Street')]
 #[ORM\Index(['label'], name: 'FTIX___Street___label', flags: ['fulltext'])]
-class Street extends AbstractEntity
+class Street
 {
     /**
      * Identificateur fédéral de rue
      */
-    // We have to override the default strategy defined in AbstractEntity
     #[ORM\Id, ORM\GeneratedValue('NONE')]
     #[ORM\Column('esid', Types::INTEGER, options: [
         'unsigned' => true,
     ])]
-    protected ?int $id = null;
+    private ?int $id = null;
 
     #[ORM\Column('label', length: 150)]
     private ?string $name = null;
@@ -87,6 +86,37 @@ class Street extends AbstractEntity
     public function __toString(): string
     {
         return (string) $this->getName();
+    }
+
+    /**
+     * @return  int<0, 4294967295>|null
+     */
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param  int<0, 4294967295>|null  $id
+     *
+     * @return  static
+     */
+    public function setId(?int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return  string  An unique value for cache purpose or data fixtures.
+     *                  avoid the id if possible because the id require the
+     *                  entity to be persisted. It can be a combinaison of
+     *                  multiple fields.
+     */
+    public function getUniqueValue(): string
+    {
+        return (string) $this->getId();
     }
 
     public function getName(): ?string
