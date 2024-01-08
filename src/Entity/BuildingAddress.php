@@ -34,9 +34,12 @@ class BuildingAddress
      * Identificateur fédéral de bâtiment
      *
      * Numéro d’identification du bâtiment selon le RegBL
+     *
+     * Note :
+     * Doctrine retourne une chaîne de caractères pour les chiffres à virgules.
      */
     #[ORM\Column(type: Types::DECIMAL)]
-    private ?float $buildingId = null;
+    private ?string $buildingId = null;
 
     /**
      * Identificateur fédéral des entrées
@@ -101,17 +104,12 @@ class BuildingAddress
         return (string) $this->getNumber();
     }
 
-    /**
-     * @return  int<0, 4294967295>|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
     /**
-     * @param  int<0, 4294967295>|null  $id
-     *
      * @return  static
      */
     public function setId(?int $id): self
@@ -144,12 +142,12 @@ class BuildingAddress
         return $this;
     }
 
-    public function getBuildingId(): ?float
+    public function getBuildingId(): ?string
     {
         return $this->buildingId;
     }
 
-    public function setBuildingId(float $buildingId): self
+    public function setBuildingId(?string $buildingId): self
     {
         $this->buildingId = $buildingId;
 
