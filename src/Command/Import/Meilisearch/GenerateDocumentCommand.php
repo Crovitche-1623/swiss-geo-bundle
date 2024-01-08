@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Crovitche\SwissGeoBundle\Command\Import\Meilisearch;
 
 use Doctrine\DBAL\{Connection, Exception};
-use MeiliSearch\Client;
+use Meilisearch\Client;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;

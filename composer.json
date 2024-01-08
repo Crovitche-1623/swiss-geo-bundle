@@ -19,7 +19,7 @@
     "guzzlehttp/guzzle": "^7.7",
     "http-interop/http-factory-guzzle": "^1.0",
     "league/csv": "^9.7",
-    "meilisearch/meilisearch-php": "^0.24.2",
+    "meilisearch/meilisearch-php": "^1.5",
     "symfony/cache": "^6.1",
     "symfony/config": "^6.1.",
     "symfony/console": "^6.1",
