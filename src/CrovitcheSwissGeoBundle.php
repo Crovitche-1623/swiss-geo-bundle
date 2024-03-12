@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
  */
 class CrovitcheSwissGeoBundle extends AbstractBundle
 {
-    private const LOCALITIES_URL = 'https://data.geo.admin.ch/ch.swisstopo-vd.ortschaftenverzeichnis_plz/PLZO_CSV_LV95.zip';
+    private const LOCALITIES_URL = 'https://data.geo.admin.ch/ch.swisstopo-vd.ortschaftenverzeichnis_plz/ortschaftenverzeichnis_plz/ortschaftenverzeichnis_plz_2056.csv.zip';
     private const STREETS_URL = 'https://data.geo.admin.ch/ch.swisstopo.amtliches-strassenverzeichnis/csv/2056/ch.swisstopo.amtliches-strassenverzeichnis.zip';
     private const BUILDING_ADDRESSES_URL = 'https://data.geo.admin.ch/ch.swisstopo.amtliches-gebaeudeadressverzeichnis/csv/2056/ch.swisstopo.amtliches-gebaeudeadressverzeichnis.zip';
     private const MEILISEARCH_URL = 'http://localhost:7071';
