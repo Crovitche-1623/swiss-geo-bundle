@@ -10,6 +10,6 @@ namespace Crovitche\SwissGeoBundle\Enum;
 enum StreetOrAddressStatus: string
 {
     case Planned = 'planned';
-    case Existing = 'existing';
+    case Existing = 'real';
     case Outdated = 'outdated';
 }
