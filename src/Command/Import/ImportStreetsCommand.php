@@ -72,7 +72,7 @@ class ImportStreetsCommand extends Command
     private function createCsvForBulkInsert(string $folder): void
     {
         $csvReader =
-            Reader::createFromPath($folder.'/pure_str.csv')
+            Reader::createFromPath($folder.'/amtliches-strassenverzeichnis_ch_2056.csv')
             ->setDelimiter(';')
             ->setHeaderOffset(0)
         ;
@@ -150,7 +150,7 @@ class ImportStreetsCommand extends Command
             ');
 
             $this->connection->executeQuery(/* @lang  MySQL */ "
-                LOAD DATA LOCAL INFILE '/var/lib/mysql-files/pure_str.csv'
+                LOAD DATA LOCAL INFILE '/var/lib/mysql-files/amtliches-strassenverzeichnis_ch_2056.csv'
                 INTO TABLE t___tmp___Street_to_be_inserted
                 CHARACTER SET utf8
                 FIELDS TERMINATED BY ';'
@@ -215,7 +215,7 @@ class ImportStreetsCommand extends Command
             $this->logger->info('load data...');
 
             $this->connection->executeQuery(/** @lang MySQL  "
-                LOAD DATA LOCAL INFILE '/var/lib/mysql-files/pure_str.csv'
+                LOAD DATA LOCAL INFILE '/var/lib/mysql-files/amtliches-strassenverzeichnis_ch_2056.csv'
                 INTO TABLE t___tmp___Street__Locality_to_be_inserted
                 CHARACTER SET utf8
                 FIELDS TERMINATED BY ';'
