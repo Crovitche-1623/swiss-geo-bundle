@@ -107,7 +107,7 @@ class ImportBuildingAddressesCommand extends Command
             $this->connection->executeQuery(/* @lang  MySQL */ "
                 LOAD DATA
                     LOCAL
-                    INFILE '/var/lib/mysql-files/pure_adr.csv'
+                    INFILE '/var/lib/mysql-files/amtliches-gebaeudeadressverzeichnis_ch_2056.csv'
                     INTO TABLE t___tmp___Building_address_to_be_inserted
                     CHARACTER SET utf8
                     FIELDS TERMINATED BY ';'
