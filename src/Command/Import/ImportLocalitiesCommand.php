@@ -69,7 +69,7 @@ class ImportLocalitiesCommand extends Command
 
         try {
             $this->connection->executeQuery(/* @lang MySQL */ "
-                LOAD DATA LOCAL INFILE '/var/lib/mysql-files/PLZO_CSV_LV95.csv'
+                LOAD DATA LOCAL INFILE '/var/lib/mysql-files/AMTOVZ_CSV_LV95.csv'
                 INTO TABLE Locality
                 CHARACTER SET utf8
                 FIELDS TERMINATED BY ';'
