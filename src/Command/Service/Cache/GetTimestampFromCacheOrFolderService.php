@@ -46,7 +46,10 @@ class GetTimestampFromCacheOrFolderService
             ->contains($timestampRegex);
 
         if (!$finder->hasResults()) {
-            throw new FileNotFoundException("There is no file called `$filename` containing a timestamp with this format (YYYY-MM-DD) in `$directory` directory.");
+            // Log something here instead of throwing an exception
+            // throw new FileNotFoundException("There is no file called `$filename` containing a timestamp with this format (YYYY-MM-DD) in `$directory` directory.");
+            
+            return (new \DatetimeImmutable())->format('Y-m-d');
         }
 
         $timestampFromFile = null;
