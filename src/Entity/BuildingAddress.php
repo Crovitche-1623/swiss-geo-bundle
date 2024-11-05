@@ -41,7 +41,7 @@ class BuildingAddress
      * Note :
      * Doctrine retourne une chaîne de caractères pour les chiffres à virgules.
      */
-    #[ORM\Column(type: Types::DECIMAL)]
+    #[ORM\Column(type: Types::STRING)]
     private ?string $buildingId = null;
 
     /**

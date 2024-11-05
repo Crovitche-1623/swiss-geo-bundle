@@ -90,7 +90,7 @@ class ImportBuildingAddressesCommand extends Command
                     egaid INT(11) UNSIGNED PRIMARY KEY NOT NULL,
                     id_street INT(10) UNSIGNED NOT NULL,
                     postal_code_and_label VARCHAR(110) NOT NULL,
-                    building_id DECIMAL(10) NOT NULL,
+                    building_id VARCHAR(10) NOT NULL,
                     entrance_number SMALLINT(6) NOT NULL,
                     address_number VARCHAR(12) DEFAULT NULL,
                     building_name VARCHAR(50) DEFAULT NULL,
