@@ -19,7 +19,11 @@ use JetBrains\PhpStorm\Pure;
  * system.
  */
 #[ORM\Entity(StreetRepository::class, true), ORM\Table('Street')]
-#[ORM\Index(['label'], name: 'FTIX___Street___label', flags: ['fulltext'])]
+#[ORM\Index(
+    columns: ['label'],
+    name: 'FTIX___Street___label',
+    flags: ['fulltext']
+)]
 class Street
 {
     /**

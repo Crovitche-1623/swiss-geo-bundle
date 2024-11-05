@@ -12,11 +12,13 @@ use Doctrine\ORM\Mapping as ORM;
  * @author  Thibault Gattolliat
  */
 #[ORM\Entity(LocalityRepository::class, true), ORM\Table('Locality')]
-#[ORM\UniqueConstraint('UQ___Locality___label__postal_code',
-    ['postal_code_and_label']
+#[ORM\UniqueConstraint(
+    name: 'UQ___Locality___label__postal_code',
+    columns: ['postal_code_and_label'],
 )]
-#[ORM\Index(['postal_code_and_label'],
-    name: 'IX___Locality___postal_code_and_label'
+#[ORM\Index(
+    columns: ['postal_code_and_label'],
+    name: 'IX___Locality___postal_code_and_label',
 )]
 class Locality extends AbstractEntity
 {

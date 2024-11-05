@@ -14,7 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
  * @author  Thibault Gattolliat
  */
 #[ORM\Entity(BuildingAddressRepository::class, true), ORM\Table('Building_address')]
-#[ORM\Index(['id_street_locality'], name: 'IX___Building_address___street_locality')]
+#[ORM\Index(
+    columns: ['id_street_locality'],
+    name: 'IX___Building_address___street_locality',
+)]
 class BuildingAddress
 {
     /**
@@ -26,7 +29,7 @@ class BuildingAddress
     ])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(StreetLocality::class, fetch: 'EAGER')]
+    #[ORM\ManyToOne(targetEntity: StreetLocality::class, fetch: 'EAGER')]
     #[ORM\JoinColumn('id_street_locality', 'id', false, false, 'CASCADE')]
     private ?StreetLocality $streetLocality = null;
 

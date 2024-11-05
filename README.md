@@ -82,7 +82,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 //...
 #[ORM\Entity(CustomerRepository::class), ORM\Table("Customer")]
-#[ORM\Index(["egaid"], name: "IX___Customer___building_address")]
+#[ORM\Index(columns: ["egaid"], name: "IX___Customer___building_address")]
 class Customer
 {
     //...
