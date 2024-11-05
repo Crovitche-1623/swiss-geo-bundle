@@ -21,6 +21,7 @@ class CrovitcheSwissGeoBundle extends AbstractBundle
     private const BUILDING_ADDRESSES_URL = 'https://data.geo.admin.ch/ch.swisstopo.amtliches-gebaeudeadressverzeichnis/csv/2056/ch.swisstopo.amtliches-gebaeudeadressverzeichnis.zip';
     private const MEILISEARCH_URL = 'http://localhost:7071';
 
+    #[\Override]
     public function configure(DefinitionConfigurator $definition): void
     {
         $definition->rootNode()
