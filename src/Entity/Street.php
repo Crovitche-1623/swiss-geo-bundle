@@ -22,7 +22,7 @@ use JetBrains\PhpStorm\Pure;
 #[ORM\Index(
     columns: ['label'],
     name: 'FTIX___Street___label',
-    flags: ['fulltext']
+    flags: ['fulltext'],
 )]
 class Street
 {
@@ -41,7 +41,11 @@ class Street
     /**
      * @var  Collection<int, StreetLocality>
      */
-    #[ORM\OneToMany('street', StreetLocality::class, orphanRemoval: true)]
+    #[ORM\OneToMany(
+        targetEntity: StreetLocality::class,
+        mappedBy: 'street',
+        orphanRemoval: true,
+    )]
     private Collection $streetLocality;
 
     /**
