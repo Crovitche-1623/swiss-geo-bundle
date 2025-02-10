@@ -7,7 +7,7 @@ namespace Crovitche\SwissGeoBundle\Command\Import;
 use Crovitche\SwissGeoBundle\Command\Service\Cache\{GetTimestampFromCacheOrFolderService, WriteCacheWithTimestampService};
 use Crovitche\SwissGeoBundle\Command\Service\ExtractZipFromServerService;
 use Crovitche\SwissGeoBundle\Command\Service\ZipArchive\Extractor;
-use Doctrine\DBAL\{Connection, Exception};
+use Doctrine\DBAL\{Connection, Exception, ParameterType};
 use League\Csv\{Reader, Writer};
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -99,13 +99,19 @@ class ImportStreetsCommand extends Command
             FROM
                 Locality l0
             WHERE
-                :ZIP_LABEL = l0.postal_code_and_label
+                l0.postal_code_and_label = :ZIP_LABEL
         ');
 
         foreach ($records as $record) {
             foreach (\explode(', ', $record['ZIP_LABEL']) as $locality) {
+                $sqlStatement->bindValue(
+                    'ZIP_LABEL',
+                    $locality,
+                    ParameterType::STRING,
+                );
+                
                 $localityId = $sqlStatement
-                    ->executeQuery(['ZIP_LABEL' => $locality])
+                    ->executeQuery()
                     ->fetchOne();
 
                 if (!$localityId) {
