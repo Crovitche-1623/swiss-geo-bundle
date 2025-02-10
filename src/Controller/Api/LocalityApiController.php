@@ -29,11 +29,6 @@ class LocalityApiController extends AbstractController
         $regionAbbreviation = $request->query->get('region_abbreviation');
         $postalCodeAndLabel = $request->query->get('postal_code_and_label');
 
-        if ($regionAbbreviation &&
-            !\preg_match('/^[A-Z]{2}$/', $regionAbbreviation)) {
-            throw new BadRequestException('Wrong region abbreviation format');
-        }
-
         $localities = $this->repository->findAllBySearchCriteria(
             $regionAbbreviation,
             $postalCodeAndLabel

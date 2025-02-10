@@ -28,7 +28,7 @@ class Locality extends AbstractEntity
     #[ORM\Column(length: 4, options: ['fixed' => true])]
     public ?string $postalCode = null;
 
-    #[ORM\Column(length: 2, options: ['fixed' => true])]
+    #[ORM\Column(length: 2, nullable: true, options: ['fixed' => true])]
     public ?string $regionAbbreviation = null;
 
     #[ORM\Column(type: Types::SMALLINT, length: 2, options: [

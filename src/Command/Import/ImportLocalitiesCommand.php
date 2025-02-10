@@ -71,7 +71,7 @@ class ImportLocalitiesCommand extends Command
             $this->connection->executeQuery(/* @lang MySQL */ "
                 LOAD DATA LOCAL INFILE '/var/lib/mysql-files/AMTOVZ_CSV_LV95.csv'
                 INTO TABLE Locality
-                CHARACTER SET utf8
+                CHARACTER SET utf8mb4
                 FIELDS TERMINATED BY ';'
                 ENCLOSED BY ''
                 LINES TERMINATED BY '\n'
@@ -80,7 +80,7 @@ class ImportLocalitiesCommand extends Command
                 SET
                     label = TRIM(@ORTSCHAFTSNAME),
                     postal_code = @PLZ,
-                    region_abbreviation = TRIM(@KANTONSKURZEL),
+                    region_abbreviation = NULLIF(TRIM(@KANTONSKURZEL), ''),
                     additional_digits = @ZUSATZZIFFER
                 ;
             ");
