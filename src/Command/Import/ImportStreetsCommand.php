@@ -152,7 +152,7 @@ class ImportStreetsCommand extends Command
             $this->connection->executeQuery(/* @lang  MySQL */ "
                 LOAD DATA LOCAL INFILE '/var/lib/mysql-files/amtliches-strassenverzeichnis_ch_2056.csv'
                 INTO TABLE t___tmp___Street_to_be_inserted
-                CHARACTER SET utf8
+                CHARACTER SET utf8mb4
                 FIELDS TERMINATED BY ';'
                 ENCLOSED BY ''
                 LINES TERMINATED BY '\n'

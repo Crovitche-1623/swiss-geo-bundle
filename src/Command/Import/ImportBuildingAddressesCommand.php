@@ -109,7 +109,7 @@ class ImportBuildingAddressesCommand extends Command
                     LOCAL
                     INFILE '/var/lib/mysql-files/amtliches-gebaeudeadressverzeichnis_ch_2056.csv'
                     INTO TABLE t___tmp___Building_address_to_be_inserted
-                    CHARACTER SET utf8
+                    CHARACTER SET utf8mb4
                     FIELDS TERMINATED BY ';'
                     ENCLOSED BY ''
                     LINES TERMINATED BY '\n'
