@@ -1,6 +1,6 @@
 # SwissGeoBundle
 
-SwissGeoBundle provide you a clean way to use swiss building addresses.
+SwissGeoBundle provide you a clean way to use swiss and liechtensteinian building addresses.
 If you have the following use cases, this bundle can be useful for you :
  - An autocomplete address input without incorrect address entries
  - Store addresses locally (**offline !**)
