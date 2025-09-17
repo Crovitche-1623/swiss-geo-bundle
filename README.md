@@ -87,7 +87,12 @@ class Customer
 {
     //...
     #[ORM\ManyToOne(BuildingAddress::class)]
-    #[ORM\JoinColumn("egaid", "egaid", false, true, "SET NULL")]
+    #[ORM\JoinColumn(
+        name: "egaid",
+        referencedColumnName: "egaid",
+        nullable: true,
+        onDelete: "SET NULL"
+    )]
     private ?BuildingAddress $postalAddress = null;
 }
 ```
