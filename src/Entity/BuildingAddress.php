@@ -30,7 +30,11 @@ class BuildingAddress
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: StreetLocality::class, fetch: 'EAGER')]
-    #[ORM\JoinColumn('id_street_locality', 'id', false, false, 'CASCADE')]
+    #[ORM\JoinColumn(
+        name: 'id_street_locality',
+        referencedColumnName: 'id',
+        onDelete: 'CASCADE'
+    )]
     private ?StreetLocality $streetLocality = null;
 
     /**

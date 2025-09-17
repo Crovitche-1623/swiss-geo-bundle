@@ -23,7 +23,12 @@ use Doctrine\ORM\Mapping as ORM;
 class StreetLocality extends AbstractEntity
 {
     #[ORM\ManyToOne(targetEntity: Street::class, inversedBy: 'streetLocality')]
-    #[ORM\JoinColumn('id_street', 'esid', false, false, 'CASCADE')]
+    #[ORM\JoinColumn(
+        name: 'id_street',
+        referencedColumnName: 'esid',
+        nullable: false,
+        onDelete: 'CASCADE'
+    )]
     private ?Street $street = null;
 
     #[ORM\ManyToOne(targetEntity: Locality::class, fetch: 'EAGER')]
