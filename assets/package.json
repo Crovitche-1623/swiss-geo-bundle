@@ -3,7 +3,7 @@
   "description": "Integration of Tom Select for addresses autocomplete in Symfony",
   "license": "GPL-3.0-only",
   "main": "assets/controllers/tom-select_controller.js",
-  "version": "0.1.0",
+  "version": "1.2.2",
   "symfony": {
     "controllers": {
       "tom-select": {
