@@ -14,7 +14,7 @@ class LocalTimestampMoreRecentException extends \Exception
         readonly string $localTimestamp,
         readonly string $remoteTimestamp,
         int $code = 422,
-        \Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         $message =
             "$subject import is stopped here because the local timestamp ".
