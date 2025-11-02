@@ -19,7 +19,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 #[AsCommand(
     name: self::COMMAND_NAME,
-    description: 'Import the swiss building addresses from cadastre.ch'
+    description: 'Import the swiss building addresses from cadastre.ch',
 )]
 class ImportBuildingAddressesCommand extends Command
 {
@@ -38,7 +38,7 @@ class ImportBuildingAddressesCommand extends Command
         private readonly LoggerInterface $logger,
         private readonly GetTimestampFromCacheOrFolderService $timestampService,
         private readonly WriteCacheWithTimestampService $writeCacheWithTimestamp,
-        private readonly string $buildingAddressesUrl
+        private readonly string $buildingAddressesUrl,
     ) {
         parent::__construct();
     }
@@ -52,8 +52,8 @@ class ImportBuildingAddressesCommand extends Command
             $output->writeln(
                 \sprintf(
                     'The command %s is already running in another process.',
-                    self::COMMAND_NAME
-                )
+                    self::COMMAND_NAME,
+                ),
             );
 
             return Command::FAILURE;
@@ -68,8 +68,15 @@ class ImportBuildingAddressesCommand extends Command
                 $this->insertDataFromCsvFile();
                 ($this->writeCacheWithTimestamp)(self::ADDRESSES_CACHE_NAME, $timestamp);
             },
-            '/var/lib/mysql-files'
+            '/var/lib/mysql-files',
         );
+
+        // Commit for those who use the AUTOCOMMIT mode disabled.
+        if (!$this->connection->isAutoCommit()
+            && $this->connection->isTransactionActive()
+        ) {
+            $this->connection->commit();
+        }
 
         return Command::SUCCESS;
     }
@@ -199,7 +206,10 @@ class ImportBuildingAddressesCommand extends Command
         } catch (Exception $e) {
             $this->connection->rollBack();
 
-            throw new InternalImportingException('building addresses'.$e->getMessage(), $e);
+            throw new InternalImportingException(
+                'building addresses'.$e->getMessage(),
+                $e,
+            );
         }
 
         $this->io->success('Building addresses has been imported!');

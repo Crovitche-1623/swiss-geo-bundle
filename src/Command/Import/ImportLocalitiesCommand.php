@@ -60,6 +60,13 @@ class ImportLocalitiesCommand extends Command
             '/var/lib/mysql-files'
         );
 
+        // Commit for those who use the AUTOCOMMIT mode disabled.
+        if (!$this->connection->isAutoCommit()
+            && $this->connection->isTransactionActive()
+        ) {
+            $this->connection->commit();
+        }
+
         return Command::SUCCESS;
     }
 
